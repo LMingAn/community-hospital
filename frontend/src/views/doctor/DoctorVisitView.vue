@@ -72,6 +72,8 @@ load()
 .visit-layout { display: grid; grid-template-columns: minmax(320px, 420px) minmax(0, 1fr); gap: 18px; align-items: start; }
 .visit-left, .visit-right { min-width: 0; }
 .visit-left .page-card { min-height: 100%; }
+.visit-left, .visit-right, .visit-layout { background: transparent !important; }
+.visit-right .page-card, .visit-left .page-card { background: var(--card-bg) !important; }
 .visit-card {
   position: relative;
   overflow: hidden;

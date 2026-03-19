@@ -33,6 +33,19 @@
   --button-neutral-text: #111827;
 }
 * { box-sizing: border-box; }
+
+html.dark-mode, html.dark-mode body, html.dark-mode #app {
+  background: #151922 !important;
+  color: #eef2fb;
+}
+html.dark-mode .page-shell,
+html.dark-mode .portal-shell,
+html.dark-mode .layout-shell,
+html.dark-mode .layout-main,
+html.dark-mode .layout-content {
+  background: var(--app-bg) !important;
+}
+
 html, body, #app { margin: 0; min-height: 100%; font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif; background: var(--app-bg); color: var(--text); }
 a { color: inherit; text-decoration: none; }
 .material-symbols-outlined { font-size: 20px; vertical-align: middle; }
@@ -332,4 +345,26 @@ a { color: inherit; text-decoration: none; }
 .dark-mode .el-table__body tr:hover > td .cell,
 .dark-mode .el-table__body tr.current-row > td .cell {
   transition: background-color 0s, color 0s !important;
+}
+
+
+html.dark-mode .visit-card.visit-selected {
+  background: #273245 !important;
+  color: #eef2fb !important;
+}
+html.dark-mode .visit-card.visit-selected *,
+html.dark-mode .visit-card.visit-selected .muted {
+  color: #eef2fb !important;
+}
+html.dark-mode .page-card,
+html.dark-mode .el-card,
+html.dark-mode .el-alert,
+html.dark-mode .el-empty,
+html.dark-mode .el-empty__image,
+html.dark-mode .el-empty__description,
+html.dark-mode .el-form,
+html.dark-mode .el-form-item,
+html.dark-mode .el-form-item__content,
+html.dark-mode .el-form-item__label {
+  background-color: transparent;
 }
