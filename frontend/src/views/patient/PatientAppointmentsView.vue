@@ -11,9 +11,9 @@
       <el-table-column prop="fee" label="挂号费" width="90" />
       <el-table-column prop="triageResult" label="分诊建议" min-width="120" />
       <el-table-column label="状态" width="100"><template #default="{ row }"><span class="status-tag" :class="statusClass(row.status)">{{ row.status }}</span></template></el-table-column>
-      <el-table-column label="操作" width="120" fixed="right">
+      <el-table-column label="操作" width="120">
         <template #default="{ row }">
-          <el-button type="danger" plain size="small" :disabled="row.status !== '待叫号'" @click="cancel(row)">取消挂号</el-button>
+          <el-button type="danger" plain size="small" class="keep-contrast-button stable-action-button" :disabled="row.status !== '待叫号'" @click="cancel(row)">取消挂号</el-button>
         </template>
       </el-table-column>
     </el-table>

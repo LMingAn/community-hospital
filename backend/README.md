@@ -100,7 +100,7 @@ cp .env.example .env
 - `DB_HOST`
 - `DB_PORT`
 - `DB_USER`
-- `DB_PASSWORD`
+- `DB_PASSWORD`（默认可设为 `123lan??`）
 - `DB_NAME`
 - `SESSION_SECRET`
 - `PORT`

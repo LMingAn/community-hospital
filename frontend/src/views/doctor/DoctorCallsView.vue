@@ -14,9 +14,9 @@
       <el-table-column prop="queueNo" label="队列号" width="80" />
       <el-table-column prop="symptom" label="症状描述" min-width="180" show-overflow-tooltip />
       <el-table-column label="状态" width="100"><template #default="{ row }"><span class="status-tag" :class="statusClass(row.status)">{{ row.status }}</span></template></el-table-column>
-      <el-table-column label="操作" width="120" fixed="right">
+      <el-table-column label="操作" width="120">
         <template #default="{ row }">
-          <el-button type="primary" size="small" :disabled="row.status !== '待叫号'" @click="callPatient(row)">叫号</el-button>
+          <el-button type="primary" size="small" class="keep-contrast-button stable-action-button" :disabled="row.status !== '待叫号'" @click="callPatient(row)">叫号</el-button>
         </template>
       </el-table-column>
     </el-table>
