@@ -14,7 +14,7 @@
           <el-form-item label="验证码">
             <div style="display:flex; gap:10px; width:100%;">
               <el-input v-model="resetForm.code" placeholder="请输入4位验证码" />
-              <el-button @click="getCode">获取验证码</el-button>
+              <el-button class="neutral-fixed-button" @click="getCode">获取验证码</el-button>
             </div>
           </el-form-item>
           <el-form-item v-if="demoCode" label="演示验证码"><el-tag type="success">{{ demoCode }}</el-tag></el-form-item>

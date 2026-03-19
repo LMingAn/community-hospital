@@ -26,6 +26,6 @@ import PageContainer from '../../components/PageContainer.vue'
 import { confirmAction, formatDateTime, statusClass, successTip } from '../../utils'
 const list = ref([])
 async function load() { const res = await patientApi.appointments(); list.value = res.data || [] }
-async function cancel(row) { await confirmAction(`确认取消 ${row.visitDate} ${row.period} 的挂号吗？`); await patientApi.cancelAppointment(row.id); successTip('挂号已取消'); load() }
+async function cancel(row) { await confirmAction(`确认取消 ${formatDateTime(row.visitDate)} ${row.period} 的挂号吗？`); await patientApi.cancelAppointment(row.id); successTip('挂号已取消'); load() }
 onMounted(load)
 </script>

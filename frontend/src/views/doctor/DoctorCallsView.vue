@@ -9,7 +9,7 @@
     <el-table :data="callableRows" border>
       <el-table-column prop="appointmentNo" label="挂号单号" min-width="180" />
       <el-table-column prop="patientName" label="患者姓名" width="110" />
-      <el-table-column prop="visitDate" label="日期" width="120" />
+      <el-table-column label="日期" min-width="180"><template #default="{ row }">{{ formatDateTime(row.visitDate) }}</template></el-table-column>
       <el-table-column prop="period" label="时段" width="90" />
       <el-table-column prop="queueNo" label="队列号" width="80" />
       <el-table-column prop="symptom" label="症状描述" min-width="180" show-overflow-tooltip />
@@ -26,7 +26,7 @@
 import { computed, ref } from 'vue'
 import { doctorApi } from '../../api/modules'
 import PageContainer from '../../components/PageContainer.vue'
-import { confirmAction, statusClass, successTip } from '../../utils'
+import { confirmAction, formatDateTime, statusClass, successTip } from '../../utils'
 const date = ref(new Date().toISOString().slice(0, 10))
 const list = ref([])
 const callableRows = computed(() => list.value || [])
