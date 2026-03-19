@@ -20,7 +20,7 @@
               <span class="status-tag" :class="statusClass(item.status)">{{ item.status }}</span>
             </div>
             <div class="muted" style="line-height:1.8; margin-bottom:12px;">症状：{{ item.symptom || '无' }}</div>
-            <el-button class="neutral-fixed-button" @click="selectRow(item)">选择此患者</el-button>
+            <el-button class="neutral-fixed-button select-patient-btn" @click="selectRow(item)">选择此患者</el-button>
           </div>
         </div>
       </section>
@@ -108,10 +108,21 @@ load()
 :global(.dark-mode) .visit-card.visit-selected .doctor-card-header span:not(.status-tag) {
   color: #eef2fb !important;
 }
-:global(.dark-mode) .visit-card.visit-selected .neutral-fixed-button {
+:global(.dark-mode) .visit-card.visit-selected .select-patient-btn,
+:global(.dark-mode) .visit-card.visit-selected .select-patient-btn.el-button,
+:global(.dark-mode) .visit-card.visit-selected .select-patient-btn span {
   background: #ffffff !important;
   color: #111827 !important;
   border-color: #2f2f2f !important;
+  opacity: 1 !important;
+  box-shadow: none !important;
+}
+:global(.dark-mode) .visit-card.visit-selected .select-patient-btn:hover,
+:global(.dark-mode) .visit-card.visit-selected .select-patient-btn:focus {
+  background: #ffffff !important;
+  color: #111827 !important;
+  border-color: #2f2f2f !important;
+  opacity: 0.96 !important;
 }
 @media (max-width: 1100px) {
   .visit-layout { grid-template-columns: 1fr; }
