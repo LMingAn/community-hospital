@@ -1,0 +1,154 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>后台管理</title><link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<header class="header"><div class="topbar"><div class="brand"><h1>后台管理</h1><p>按模块分层展示科室、排班、挂号、就诊、住院和用户管理信息</p></div><nav class="nav"><a href="/index.html">首页</a><a href="/pages/patient.html">患者中心</a><a href="/pages/doctor.html">医生中心</a><a href="/pages/login.html">管理员登录</a><a class="active" href="/pages/admin.html">后台管理</a><button id="adminLogoutBtn">管理员注销</button></nav></div></header>
+<main class="container">
+<div id="adminNotice" class="notice"></div>
+<div class="page-shell">
+  <aside class="sidebar-card">
+    <h3 class="sidebar-title">后台功能导航</h3>
+    <div class="side-menu" id="adminSectionMenu">
+      <button class="active" data-section="home">系统首页</button>
+      <button data-section="info">信息管理</button>
+      <button data-section="clinic">预约就诊</button>
+      <button data-section="user">用户管理</button>
+      <button data-section="profile">个人中心</button>
+    </div>
+  </aside>
+  <div class="main-panel">
+    <div class="breadcrumb">后台管理 &gt; <strong id="adminBreadcrumb">系统首页</strong></div>
+
+    <section class="section-panel" data-section="home">
+      <div class="tabbar"><button class="active" data-tab="home-overview">首页概览</button><button data-tab="home-announcement">公告列表</button></div>
+      <div class="tab-panel" data-tab="home-overview">
+        <div class="info-strip"><div><span>当前模块</span><strong>系统首页</strong></div><div><span>说明</span><strong>查看全局统计与运行概览</strong></div></div>
+        <section class="grid-4">
+          <div class="stat-card"><span>医生总数</span><strong id="doctorCount">0</strong></div>
+          <div class="stat-card"><span>患者总数</span><strong id="patientCount">0</strong></div>
+          <div class="stat-card"><span>今日挂号</span><strong id="todayReg">0</strong></div>
+          <div class="stat-card"><span>住院人数</span><strong id="hospitalCount">0</strong></div>
+        </section>
+      </div>
+      <div class="tab-panel hidden-panel" data-tab="home-announcement">
+        <section class="card"><h3>系统公告列表</h3><div id="adminAnnouncementList"></div></section>
+      </div>
+    </section>
+
+    <section class="section-panel hidden-panel" data-section="info">
+      <div class="tabbar"><button class="active" data-tab="info-announcement">公告信息</button><button data-tab="info-department">科室信息</button><button data-tab="info-schedule">医生排班</button></div>
+      <div class="tab-panel" data-tab="info-announcement">
+        <section class="card"><h3>系统公告管理</h3><form id="announcementForm" class="list-card"><div class="form-group"><label>公告标题</label><input name="title" required></div><div class="form-group"><label>公告内容</label><textarea name="content" required></textarea></div><button class="btn" type="submit">发布公告</button></form></section>
+      </div>
+      <div class="tab-panel hidden-panel" data-tab="info-department">
+        <section class="card"><h3>科室信息</h3><div class="table-wrap"><table><thead><tr><th>科室</th><th>位置</th><th>说明</th></tr></thead><tbody id="departmentTable"></tbody></table></div></section>
+      </div>
+      <div class="tab-panel hidden-panel" data-tab="info-schedule">
+        <section class="card"><h3>医生排班管理</h3><form id="scheduleForm" class="list-card"><div class="form-row"><div class="form-group"><label>医生</label><select name="doctorId" id="scheduleDoctorSelect"></select></div><div class="form-group"><label>星期几</label><select name="weekday"><option value="1">周一</option><option value="2">周二</option><option value="3">周三</option><option value="4">周四</option><option value="5">周五</option><option value="6">周六</option><option value="7">周日</option></select></div></div><div class="form-row"><div class="form-group"><label>时段</label><select name="period"><option value="上午">上午</option><option value="下午">下午</option><option value="夜间">夜间</option></select></div><div class="form-group"><label>号源上限</label><input name="maxNumber" type="number" value="20"></div></div><div class="form-row"><div class="form-group"><label>挂号费</label><input name="fee" type="number" step="0.01" value="15"></div><div class="form-group" style="display:flex;align-items:flex-end;"><button class="btn" type="submit">新增排班</button></div></div></form><div class="table-wrap" style="margin-top:12px;"><table><thead><tr><th>医生</th><th>排班</th><th>号源/费用</th><th>状态</th></tr></thead><tbody id="scheduleTable"></tbody></table></div></section>
+      </div>
+    </section>
+
+    <section class="section-panel hidden-panel" data-section="clinic">
+      <div class="tabbar"><button class="active" data-tab="clinic-appointment">预约挂号</button><button data-tab="clinic-visit">患者就诊</button><button data-tab="clinic-hospital">住院登记</button></div>
+      <div class="tab-panel" data-tab="clinic-appointment"><section class="card"><h3>预约挂号管理</h3><div class="table-wrap"><table><thead><tr><th>患者</th><th>医生</th><th>就诊</th><th>状态</th></tr></thead><tbody id="appointmentTable"></tbody></table></div></section></div>
+      <div class="tab-panel hidden-panel" data-tab="clinic-visit"><section class="card"><h3>患者就诊管理</h3><div class="table-wrap"><table><thead><tr><th>患者</th><th>单号</th><th>诊断</th><th>住院</th></tr></thead><tbody id="visitTable"></tbody></table></div></section></div>
+      <div class="tab-panel hidden-panel" data-tab="clinic-hospital"><section class="card"><h3>住院登记管理</h3><div class="table-wrap"><table><thead><tr><th>患者</th><th>病区床位</th><th>原因</th><th>状态</th></tr></thead><tbody id="hospitalTable"></tbody></table></div></section></div>
+    </section>
+
+    <section class="section-panel hidden-panel" data-section="user">
+      <div class="tabbar"><button class="active" data-tab="user-admin">管理员信息</button><button data-tab="user-doctor">医生信息</button><button data-tab="user-patient">患者信息</button></div>
+      <div class="tab-panel" data-tab="user-admin"><section class="card"><h3>管理员信息</h3><div id="adminProfileBox" class="list-card"></div></section></div>
+      <div class="tab-panel hidden-panel" data-tab="user-doctor"><section class="card"><h3>医生信息</h3><div class="table-wrap"><table><thead><tr><th>医生</th><th>科室</th><th>职称</th><th>电话</th></tr></thead><tbody id="doctorTable"></tbody></table></div></section></div>
+      <div class="tab-panel hidden-panel" data-tab="user-patient"><section class="card"><h3>患者信息</h3><div class="table-wrap"><table><thead><tr><th>患者</th><th>联系方式</th><th>余额</th></tr></thead><tbody id="patientTable"></tbody></table></div></section></div>
+    </section>
+
+    <section class="section-panel hidden-panel" data-section="profile">
+      <div class="tabbar"><button class="active" data-tab="profile-info">个人信息</button><button data-tab="profile-password">修改密码</button></div>
+      <div class="tab-panel" data-tab="profile-info"><section class="card"><h3>管理员个人信息</h3><div id="adminProfileBoxMirror" class="list-card"></div></section></div>
+      <div class="tab-panel hidden-panel" data-tab="profile-password"><section class="card"><h3>修改密码</h3><form id="adminPwdForm" class="list-card"><div class="form-row"><div class="form-group"><label>原密码</label><input name="oldPassword" type="password" required></div><div class="form-group"><label>新密码</label><input name="newPassword" type="password" required></div></div><button class="btn-secondary" type="submit">修改密码</button></form></section></div>
+    </section>
+  </div>
+</div>
+</main>
+<footer class="footer">当前页面采用“左侧一级菜单 + 页面内二级标签”布局，更适合毕设答辩中的模块化演示。</footer>
+<script src="/js/common.js"></script>
+<script>
+function initLayeredPage(menuId, breadcrumbId){
+  const menu = document.getElementById(menuId);
+  const breadcrumb = document.getElementById(breadcrumbId);
+  menu.querySelectorAll('button').forEach(btn=>btn.addEventListener('click', ()=>{
+    const sec = btn.dataset.section;
+    menu.querySelectorAll('button').forEach(i=>i.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.section-panel').forEach(panel=>panel.classList.toggle('hidden-panel', panel.dataset.section !== sec));
+    breadcrumb.textContent = btn.textContent.trim();
+    const current = document.querySelector(`.section-panel[data-section="${sec}"]`);
+    current.querySelectorAll('.tabbar').forEach(tabbar=>{
+      const first = tabbar.querySelector('button');
+      if(first) first.click();
+    });
+  }));
+  document.querySelectorAll('.tabbar').forEach(tabbar=>{
+    const panel = tabbar.closest('.section-panel');
+    tabbar.querySelectorAll('button').forEach(btn=>btn.addEventListener('click', ()=>{
+      const tab = btn.dataset.tab;
+      tabbar.querySelectorAll('button').forEach(i=>i.classList.remove('active'));
+      btn.classList.add('active');
+      panel.querySelectorAll('.tab-panel').forEach(tp=>tp.classList.toggle('hidden-panel', tp.dataset.tab !== tab));
+    }));
+  });
+}
+async function ensureAdmin(){ try{ await request('/api/auth/admin/check'); } catch { window.location.href = '/pages/login.html?redirect=' + encodeURIComponent('/pages/admin.html'); } }
+async function loadAdminData(){
+  const stats = await request('/api/admin/stats');
+  document.getElementById('doctorCount').textContent = stats.data.doctorCount;
+  document.getElementById('patientCount').textContent = stats.data.patientCount;
+  document.getElementById('todayReg').textContent = stats.data.todayReg;
+  document.getElementById('hospitalCount').textContent = stats.data.hospitalCount;
+
+  const profile = await request('/api/admin/profile');
+  const profileHtml = `<p><strong>${profile.data.nickname}</strong>（${profile.data.username}）</p><p>电话：${profile.data.phone || '-'}｜邮箱：${profile.data.email || '-'}</p>`;
+  setHtml('adminProfileBox', `<div class="list-card">${profileHtml}</div>`);
+  setHtml('adminProfileBoxMirror', profileHtml);
+
+  const [departments, doctors, patients, schedules, appointments, visits, hospitals, announcements] = await Promise.all([
+    request('/api/departments'),
+    request('/api/admin/doctors'),
+    request('/api/admin/patients'),
+    request('/api/admin/schedules'),
+    request('/api/admin/appointments'),
+    request('/api/admin/visits'),
+    request('/api/admin/hospitalizations'),
+    request('/api/announcements')
+  ]);
+
+  setHtml('departmentTable', departments.data.map(i => `<tr><td>${i.name}</td><td>${i.location || '-'}</td><td>${i.description || '-'}</td></tr>`).join('') || '<tr><td colspan="3" class="muted">暂无科室数据</td></tr>');
+  setHtml('doctorTable', doctors.data.map(i => `<tr><td>${i.name}</td><td>${i.departmentName}</td><td>${i.title}</td><td>${i.phone}</td></tr>`).join('') || '<tr><td colspan="4" class="muted">暂无医生数据</td></tr>');
+  setHtml('patientTable', patients.data.map(i => `<tr><td>${i.name}</td><td>${i.phone}</td><td>${Number(i.balance).toFixed(2)}</td></tr>`).join('') || '<tr><td colspan="3" class="muted">暂无患者数据</td></tr>');
+  setHtml('scheduleDoctorSelect', doctors.data.map(i => `<option value="${i.id}">${i.name}（${i.departmentName}）</option>`).join(''));
+  setHtml('scheduleTable', schedules.data.map(i => `<tr><td>${i.doctorName}</td><td>${weekdayLabel(i.weekday)} ${i.period}</td><td>${i.maxNumber} / ${i.fee} 元</td><td><span class="badge ${i.status ? 'success' : 'danger'}">${i.status ? '启用' : '停用'}</span></td></tr>`).join('') || '<tr><td colspan="4" class="muted">暂无排班数据</td></tr>');
+  setHtml('appointmentTable', appointments.data.map(i => `<tr><td>${i.patientName}</td><td>${i.doctorName}<br>${i.departmentName}</td><td>${i.visitDate} ${i.period}<br>排队号：${i.queueNo}</td><td><span class="badge ${badgeClass(i.status)}">${i.status}</span></td></tr>`).join('') || '<tr><td colspan="4" class="muted">暂无挂号数据</td></tr>');
+  setHtml('visitTable', visits.data.map(i => `<tr><td>${i.patientName}</td><td>${i.appointmentNo}</td><td>${i.diagnosis || '-'}</td><td>${i.needHospitalization ? '是' : '否'}</td></tr>`).join('') || '<tr><td colspan="4" class="muted">暂无就诊数据</td></tr>');
+  setHtml('hospitalTable', hospitals.data.map(i => `<tr><td>${i.patientName}</td><td>${i.wardNo || '-'} / ${i.bedNo || '-'}</td><td>${i.reasonText || '-'}</td><td><span class="badge ${badgeClass(i.status)}">${i.status}</span></td></tr>`).join('') || '<tr><td colspan="4" class="muted">暂无住院数据</td></tr>');
+  setHtml('adminAnnouncementList', announcements.data.map(i => `<div class="list-card" style="margin-top:10px;"><strong>${i.title}</strong><p>${i.content}</p><p class="muted">发布时间：${(i.createdAt || '').toString().slice(0,10)}</p></div>`).join('') || '<p class="muted">暂无公告</p>');
+}
+
+document.getElementById('adminPwdForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const form = new FormData(e.target);
+  try { await request('/api/auth/admin/password', { method:'PATCH', body: JSON.stringify(Object.fromEntries(form)) }); showNotice('adminNotice', '管理员密码修改成功', 'success'); e.target.reset(); } catch (err) { showNotice('adminNotice', err.message, 'error'); }
+});
+document.getElementById('announcementForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const form = new FormData(e.target);
+  try { await request('/api/admin/announcements', { method:'POST', body: JSON.stringify(Object.fromEntries(form)) }); showNotice('adminNotice', '公告发布成功', 'success'); e.target.reset(); loadAdminData(); } catch (err) { showNotice('adminNotice', err.message, 'error'); }
+});
+document.getElementById('scheduleForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const form = new FormData(e.target);
+  try { await request('/api/admin/schedules', { method:'POST', body: JSON.stringify(Object.fromEntries(form)) }); showNotice('adminNotice', '排班新增成功', 'success'); e.target.reset(); loadAdminData(); } catch (err) { showNotice('adminNotice', err.message, 'error'); }
+});
+document.getElementById('adminLogoutBtn').addEventListener('click', async () => { await request('/api/auth/admin/logout', { method:'POST' }); window.location.href='/pages/login.html'; });
+
+initLayeredPage('adminSectionMenu','adminBreadcrumb');
+ensureAdmin().then(loadAdminData);
+</script>
+</body></html>

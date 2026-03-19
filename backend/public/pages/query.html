@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>预约查询</title><link rel="stylesheet" href="/css/style.css" /></head>
+<body>
+<header class="header"><div class="topbar"><div class="brand"><h1>预约查询</h1><p>通过手机号查看预约记录和时间线</p></div><nav class="nav"><a href="/index.html">首页</a><a href="/pages/appointment.html">在线预约</a><a class="active" href="/pages/query.html">预约查询</a><a href="/pages/doctors.html">科室医生</a><a href="/pages/admin.html">后台管理</a><a id="loginEntry" href="/pages/login.html?redirect=/pages/query.html">管理员登录</a><button id="logoutEntry" style="display:none;">注销</button></nav></div></header>
+<main class="container">
+  <div class="card">
+    <h3>查询预约记录</h3>
+    <div id="queryNotice" class="notice"></div>
+    <div class="form-row">
+      <div class="form-group"><label>手机号</label><input id="phone" placeholder="请输入预约手机号" /></div>
+      <div class="form-group" style="display:flex;align-items:flex-end;"><button class="btn" id="queryBtn">查询</button></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:18px;">
+    <h3>预约列表</h3>
+    <div class="table-wrap"><table><thead><tr><th>预约单号</th><th>患者</th><th>科室/医生</th><th>就诊时间</th><th>状态</th><th>操作</th></tr></thead><tbody id="appointmentTable"><tr><td colspan="6" class="muted">暂无数据</td></tr></tbody></table></div>
+  </div>
+  <div class="card" style="margin-top:18px;">
+    <h3>预约状态时间线</h3>
+    <div id="timelineBox" class="muted">点击“查看时间线”后展示。</div>
+  </div>
+</main>
+<footer class="footer">支持取消未完成的预约记录</footer>
+<script src="/js/common.js"></script>
+<script>
+async function queryAppointments() {
+  clearNotice('queryNotice');
+  const phone = document.getElementById('phone').value.trim();
+  if (!phone) return showNotice('queryNotice', '请输入手机号', 'error');
+  try {
+    const res = await request(`/api/appointments?phone=${phone}`);
+    const rows = res.data;
+    const tbody = document.getElementById('appointmentTable');
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="6">未查询到预约记录</td></tr>';
+      return;
+    }
+    tbody.innerHTML = rows.map(row => `<tr>
+      <td>${row.appointmentNo}</td>
+      <td>${row.patientName}<br><span class="muted">${row.phone}</span></td>
+      <td>${row.departmentName}<br>${row.doctorName}（${row.title}）</td>
+      <td>${row.visitDate} ${row.period}</td>
+      <td>${row.status}</td>
+      <td>
+        <button class="btn-secondary" onclick="viewTimeline('${row.appointmentNo}')">查看时间线</button>
+        ${row.status === '已取消' || row.status === '已完成' ? '' : `<button class="btn-danger" onclick="cancelAppointment(${row.id})">取消预约</button>`}
+      </td>
+    </tr>`).join('');
+  } catch (error) {
+    showNotice('queryNotice', error.message, 'error');
+  }
+}
+async function viewTimeline(no) {
+  const res = await request(`/api/appointments/timeline/${no}`);
+  const logs = res.data.logs;
+  document.getElementById('timelineBox').innerHTML = `<p><strong>预约单号：</strong>${no}</p><div class="timeline">${logs.map(log => `<div class="timeline-item"><div><strong>${log.action}</strong></div><div class="muted">${log.createdAt}</div><div>${log.remark}</div></div>`).join('')}</div>`;
+}
+async function cancelAppointment(id) {
+  if (!confirm('确认取消这条预约记录吗？')) return;
+  try {
+    await request(`/api/appointments/${id}/cancel`, { method: 'PATCH' });
+    alert('取消成功');
+    queryAppointments();
+  } catch (error) {
+    alert(error.message);
+  }
+}
+document.getElementById('queryBtn').addEventListener('click', queryAppointments);
+</script>
+</body>
+</html>

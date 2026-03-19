@@ -1,0 +1,4 @@
+<template><PageContainer title="科室信息" desc="展示平台现有科室与基础位置说明"><el-table :data="list" border><el-table-column prop="name" label="科室名称" min-width="160" /><el-table-column prop="description" label="科室说明" min-width="220" /><el-table-column prop="location" label="位置" min-width="140" /><el-table-column label="状态" width="100"><template #default="{ row }"><span class="status-tag" :class="row.status === 1 ? 'status-success' : 'status-warning'">{{ row.status === 1 ? '启用' : '停用' }}</span></template></el-table-column></el-table></PageContainer></template>
+<script setup>
+import { onMounted, ref } from 'vue'; import { adminApi } from '../../api/modules'; import PageContainer from '../../components/PageContainer.vue'; const list = ref([]); onMounted(async () => { const res = await adminApi.departments(); list.value = res.data })
+</script>
