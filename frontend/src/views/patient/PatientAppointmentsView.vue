@@ -1,6 +1,9 @@
 <template>
   <PageContainer title="我的挂号" desc="查看个人所有挂号记录，并支持叫号前在线取消">
-    <el-table :data="list" border>
+    <template #extra>
+      <el-input v-model="keyword" placeholder="搜索挂号单号/医生/科室/状态" clearable style="max-width: 300px" />
+    </template>
+    <el-table :data="filteredList" border>
       <el-table-column label="挂号单号" min-width="180"><template #default="{ row }">{{ row.appointmentNo }}</template></el-table-column>
       <el-table-column label="就诊日期" width="180"><template #default="{ row }">{{ formatDateTime(row.visitDate) }}</template></el-table-column>
       <el-table-column prop="period" label="时段" width="90" />
@@ -20,11 +23,17 @@
   </PageContainer>
 </template>
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { patientApi } from '../../api/modules'
 import PageContainer from '../../components/PageContainer.vue'
 import { confirmAction, formatDateTime, statusClass, successTip } from '../../utils'
 const list = ref([])
+const keyword = ref('')
+const filteredList = computed(() => {
+  const q = keyword.value.trim()
+  if (!q) return list.value
+  return list.value.filter((row) => `${row.appointmentNo || ''}${row.doctorName || ''}${row.departmentName || ''}${row.status || ''}${formatDateTime(row.visitDate)}`.includes(q))
+})
 async function load() { const res = await patientApi.appointments(); list.value = res.data || [] }
 async function cancel(row) { await confirmAction(`确认取消 ${formatDateTime(row.visitDate)} ${row.period} 的挂号吗？`); await patientApi.cancelAppointment(row.id); successTip('挂号已取消'); load() }
 onMounted(load)

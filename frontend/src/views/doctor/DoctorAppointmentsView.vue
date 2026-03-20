@@ -3,10 +3,11 @@
     <template #extra>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
         <el-date-picker v-model="date" type="date" value-format="YYYY-MM-DD" />
+        <el-input v-model="keyword" placeholder="搜索挂号单号/患者/手机号/状态" clearable style="max-width: 320px" />
         <el-button type="primary" @click="load">刷新列表</el-button>
       </div>
     </template>
-    <el-table :data="list" border>
+    <el-table :data="filteredList" border>
       <el-table-column prop="appointmentNo" label="挂号单号" min-width="180" />
       <el-table-column prop="patientName" label="患者姓名" width="110" />
       <el-table-column prop="gender" label="性别" width="80" />
@@ -21,12 +22,18 @@
   </PageContainer>
 </template>
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { doctorApi } from '../../api/modules'
 import PageContainer from '../../components/PageContainer.vue'
 import { formatDateTime, statusClass } from '../../utils'
 const date = ref(new Date().toISOString().slice(0, 10))
 const list = ref([])
+const keyword = ref('')
+const filteredList = computed(() => {
+  const q = keyword.value.trim()
+  if (!q) return list.value
+  return list.value.filter((row) => `${row.appointmentNo || ''}${row.patientName || ''}${row.phone || ''}${row.status || ''}${row.symptom || ''}${formatDateTime(row.visitDate)}`.includes(q))
+})
 async function load() { const res = await doctorApi.appointments({ date: date.value }); list.value = res.data || [] }
 load()
 </script>

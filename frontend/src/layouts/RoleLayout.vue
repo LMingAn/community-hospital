@@ -11,12 +11,17 @@
       <header class="layout-header">
         <div class="layout-header-top">
           <div class="path-bar muted">
-            <span>首页</span>
-            <span class="path-sep">&gt;</span>
-            <span>{{ currentGroup?.title || headerTitle }}</span>
-            <template v-if="route.meta.title && route.meta.title !== currentGroup?.title">
+            <template v-if="currentGroup?.title === '首页' || route.meta.title === '首页'">
+              <span>首页</span>
+            </template>
+            <template v-else>
+              <span>首页</span>
               <span class="path-sep">&gt;</span>
-              <span>{{ route.meta.title }}</span>
+              <span>{{ currentGroup?.title || headerTitle }}</span>
+              <template v-if="route.meta.title && route.meta.title !== currentGroup?.title">
+                <span class="path-sep">&gt;</span>
+                <span>{{ route.meta.title }}</span>
+              </template>
             </template>
           </div>
           <div class="header-actions">
