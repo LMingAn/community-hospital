@@ -1,9 +1,13 @@
 <template>
   <PageContainer title="住院登记" desc="支持住院登记信息的新增、查询、编辑与删除">
     <template #extra>
-      <div class="toolbar">
-        <el-input v-model="keyword" placeholder="搜索患者/病区/床位/状态" clearable style="max-width:280px" />
-        <el-button type="primary" @click="openCreate">新增住院登记</el-button>
+      <div class="page-toolbar">
+        <div class="page-toolbar-left">
+          <el-input v-model="keyword" placeholder="搜索患者/病区/床位/状态" clearable class="page-search-input" />
+        </div>
+        <div class="page-toolbar-right">
+          <el-button type="primary" @click="openCreate">新增住院登记</el-button>
+        </div>
       </div>
     </template>
     <el-table :data="filteredList" border>

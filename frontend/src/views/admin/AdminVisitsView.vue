@@ -1,9 +1,13 @@
 <template>
   <PageContainer title="患者就诊" desc="支持就诊信息的新增、查询、编辑与删除">
     <template #extra>
-      <div class="toolbar">
-        <el-input v-model="keyword" placeholder="搜索挂号单号/患者/医生/诊断" clearable style="max-width:280px" />
-        <el-button type="primary" @click="openCreate">新增就诊记录</el-button>
+      <div class="page-toolbar">
+        <div class="page-toolbar-left">
+          <el-input v-model="keyword" placeholder="搜索挂号单号/患者/医生/诊断" clearable class="page-search-input" />
+        </div>
+        <div class="page-toolbar-right">
+          <el-button type="primary" @click="openCreate">新增就诊记录</el-button>
+        </div>
       </div>
     </template>
     <el-table :data="filteredList" border>

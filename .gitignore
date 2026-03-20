@@ -11261,9 +11261,6 @@ frontend/node_modules/lodash-es/wrapperChain.js
 frontend/node_modules/lodash-es/wrapperLodash.js
 frontend/node_modules/lodash-es/wrapperReverse.js
 frontend/node_modules/lodash-es/wrapperValue.js
-frontend/node_modules/lodash-es/xor.js
-frontend/node_modules/lodash-es/xorBy.js
-frontend/node_modules/lodash-es/xorWith.js
 frontend/node_modules/lodash/_apply.js
 frontend/node_modules/lodash/_arrayAggregator.js
 frontend/node_modules/lodash/_arrayEach.js
@@ -12315,6 +12312,9 @@ frontend/node_modules/lodash/fp/zipObj.js
 frontend/node_modules/lodash/fp/zipObject.js
 frontend/node_modules/lodash/fp/zipObjectDeep.js
 frontend/node_modules/lodash/fp/zipWith.js
+frontend/node_modules/lodash-es/xor.js
+frontend/node_modules/lodash-es/xorBy.js
+frontend/node_modules/lodash-es/xorWith.js
 frontend/node_modules/lodash-es/zip.js
 frontend/node_modules/lodash-es/zipObject.js
 frontend/node_modules/lodash-es/zipObjectDeep.js

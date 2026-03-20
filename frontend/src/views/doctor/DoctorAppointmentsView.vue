@@ -1,10 +1,14 @@
 <template>
   <PageContainer title="挂号患者" desc="查看当天挂自己号的患者挂号信息">
     <template #extra>
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-        <el-date-picker v-model="date" type="date" value-format="YYYY-MM-DD" />
-        <el-input v-model="keyword" placeholder="搜索挂号单号/患者/手机号/状态" clearable style="max-width: 320px" />
-        <el-button type="primary" @click="load">刷新列表</el-button>
+      <div class="page-toolbar">
+        <div class="page-toolbar-left">
+          <el-date-picker v-model="date" type="date" value-format="YYYY-MM-DD" />
+          <el-input v-model="keyword" placeholder="搜索挂号单号/患者/手机号/状态" clearable class="page-search-input" />
+        </div>
+        <div class="page-toolbar-right">
+          <el-button type="primary" @click="load">刷新列表</el-button>
+        </div>
       </div>
     </template>
     <el-table :data="filteredList" border>
