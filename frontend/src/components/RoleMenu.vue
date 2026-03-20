@@ -8,24 +8,32 @@
     text-color="inherit"
     active-text-color="#2f6bce"
   >
-    <el-sub-menu v-for="group in menus" :key="group.key" :index="group.key">
-      <template #title>
+    <template v-for="group in menus" :key="group.key">
+      <el-menu-item v-if="group.path && !group.tabs?.length" :index="group.path">
         <span class="menu-title-wrap">
           <span class="material-symbols-outlined menu-icon">{{ group.icon || 'folder' }}</span>
           <span>{{ group.title }}</span>
         </span>
-      </template>
-      <el-menu-item v-for="tab in group.tabs" :key="tab.path" :index="tab.path">
-        <span>{{ tab.label }}</span>
       </el-menu-item>
-    </el-sub-menu>
+      <el-sub-menu v-else :index="group.key">
+        <template #title>
+          <span class="menu-title-wrap">
+            <span class="material-symbols-outlined menu-icon">{{ group.icon || 'folder' }}</span>
+            <span>{{ group.title }}</span>
+          </span>
+        </template>
+        <el-menu-item v-for="tab in group.tabs" :key="tab.path" :index="tab.path">
+          <span>{{ tab.label }}</span>
+        </el-menu-item>
+      </el-sub-menu>
+    </template>
   </el-menu>
 </template>
 
 <script setup>
 import { computed } from 'vue'
 const props = defineProps({ menus: { type: Array, default: () => [] }, activePath: { type: String, default: '' } })
-const defaultOpeneds = computed(() => props.menus.map((item) => item.key))
+const defaultOpeneds = computed(() => props.menus.filter((item) => item.tabs?.length).map((item) => item.key))
 </script>
 
 <style scoped>

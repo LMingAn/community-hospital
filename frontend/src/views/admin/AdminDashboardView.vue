@@ -1,5 +1,5 @@
 <template>
-  <PageContainer title="首页展示" desc="展示医院预约平台的基础业务数据、系统公告与今日排班情况">
+  <PageContainer title="首页" desc="展示医院预约平台的基础业务数据、系统公告与今日排班情况">
     <div class="dashboard-grid">
       <StatCard title="医生总数" :value="stats.doctorCount" />
       <StatCard title="患者总数" :value="stats.patientCount" />
