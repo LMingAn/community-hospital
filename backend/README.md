@@ -66,7 +66,7 @@
 在 MySQL 8.0 / Workbench 中执行：
 
 ```sql
-backend/sql/init.sql
+backend/sql/create_database.sql 和 sql/seed_data.sql
 ```
 
 将创建数据库：

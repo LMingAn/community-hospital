@@ -2,7 +2,7 @@ const pool = require('../config/db');
 
 exports.announcements = async (req, res, next) => {
   try {
-    const [rows] = await pool.query(`SELECT id, title, content, DATE_FORMAT(publish_time, '%Y-%m-%d %H:%i:%s') AS publishTime FROM announcements WHERE status = 1 ORDER BY publish_time DESC`);
+    const [rows] = await pool.query(`SELECT id, title, content, DATE_FORMAT(published_at, '%Y-%m-%d %H:%i:%s') AS publishTime FROM announcements WHERE status = 1 ORDER BY published_at DESC`);
     res.json({ success: true, data: rows });
   } catch (error) { next(error); }
 };
@@ -10,7 +10,7 @@ exports.announcements = async (req, res, next) => {
 exports.mySchedules = async (req, res, next) => {
   try {
     const [rows] = await pool.query(
-      'SELECT id, weekday, period, max_number AS maxNumber, fee, status FROM weekly_schedules WHERE doctor_id = ? ORDER BY weekday, FIELD(period, "上午","下午","夜间")',
+      'SELECT id, weekday, period, max_slots AS maxNumber, fee, status FROM weekly_schedules WHERE doctor_id = ? ORDER BY weekday, FIELD(period, "上午","下午","夜间")',
       [req.session.doctor.id]
     );
     res.json({ success: true, data: rows });
@@ -21,13 +21,13 @@ exports.myAppointments = async (req, res, next) => {
   try {
     const date = req.query.date || new Date().toISOString().slice(0, 10);
     const [rows] = await pool.query(
-      `SELECT a.id, a.appointment_no AS appointmentNo, a.visit_date AS visitDate, a.period, a.queue_no AS queueNo, a.status, a.symptom,
+      `SELECT a.id, a.appointment_no AS appointmentNo, a.visit_date AS visitDate, a.period, a.queue_number AS queueNo, a.status, a.symptom,
               p.name AS patientName, p.gender, p.age, p.phone, dp.name AS departmentName
        FROM appointments a
        JOIN patients p ON a.patient_id = p.id
-       JOIN departments dp ON a.department_id = dp.id
+       JOIN departments dp ON a.dept_id = dp.id
        WHERE a.doctor_id = ? AND a.visit_date = ?
-       ORDER BY FIELD(a.period, '上午','下午','夜间'), a.queue_no`, [req.session.doctor.id, date]
+       ORDER BY FIELD(a.period, '上午','下午','夜间'), a.queue_number`, [req.session.doctor.id, date]
     );
     res.json({ success: true, data: rows });
   } catch (error) { next(error); }
@@ -79,15 +79,15 @@ exports.saveVisit = async (req, res, next) => {
     }
     await conn.query("UPDATE appointments SET status = '已完成' WHERE id = ?", [appointmentId]);
     await conn.query(
-      `INSERT INTO visit_records (appointment_id, patient_id, doctor_id, diagnosis, advice_html, prescription, need_hospitalization)
+      `INSERT INTO visit_records (appointment_id, patient_id, doctor_id, diagnosis, advice_content_html, prescription, need_inpatient)
        VALUES (?, ?, ?, ?, ?, ?, ?)
-       ON DUPLICATE KEY UPDATE diagnosis = VALUES(diagnosis), advice_html = VALUES(advice_html), prescription = VALUES(prescription), need_hospitalization = VALUES(need_hospitalization)`,
+       ON DUPLICATE KEY UPDATE diagnosis = VALUES(diagnosis), advice_content_html = VALUES(advice_content_html), prescription = VALUES(prescription), need_inpatient = VALUES(need_inpatient)`,
       [appointmentId, appointment.patientId, req.session.doctor.id, diagnosis || '', adviceHtml || '', prescription || '', needHospitalization ? 1 : 0]
     );
     const [[visitRow]] = await conn.query('SELECT id FROM visit_records WHERE appointment_id = ?', [appointmentId]);
     if (needHospitalization) {
       await conn.query(
-        `INSERT INTO hospitalization_records (patient_id, visit_record_id, ward_no, bed_no, reason_text, status)
+        `INSERT INTO hospitalization_records (patient_id, visit_id, ward_no, bed_no, admission_reason, status)
          VALUES (?, ?, ?, ?, ?, '待入院')`,
         [appointment.patientId, visitRow.id, wardNo || '', bedNo || '', reasonText || diagnosis || '根据病情建议住院观察']
       );
