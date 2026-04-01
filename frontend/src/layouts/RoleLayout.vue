@@ -18,6 +18,7 @@
             <span>{{ route.meta.title }}</span>
           </div>
           <div class="header-actions">
+<<<<<<< HEAD
             <span class="muted">欢迎，{{ auth.displayName }}</span>
             <span class="muted">{{ currentTime }}</span>
             <el-tooltip content="黑白模式切换" placement="bottom">
@@ -26,6 +27,16 @@
               </el-button>
             </el-tooltip>
             <el-button type="danger" plain @click="logout">退出登录</el-button>
+=======
+            <el-tooltip content="黑白模式切换" placement="bottom">
+              <el-button circle plain class="theme-button" @click="toggleTheme">
+                <span class="material-symbols-outlined">{{ isDark ? 'light_mode' : 'dark_mode' }}</span>
+              </el-button>
+            </el-tooltip>
+            <span class="muted">{{ currentTime }}</span>
+            <span class="muted">欢迎，{{ auth.displayName }}</span>
+            <el-button type="danger" plain class="keep-contrast-button" @click="logout">退出登录</el-button>
+>>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
           </div>
         </div>
       </header>

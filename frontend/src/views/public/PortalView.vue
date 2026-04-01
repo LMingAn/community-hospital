@@ -1,6 +1,16 @@
 <template>
+<<<<<<< HEAD
   <div class="portal-shell">
     <div class="portal-card page-card page-block">
+=======
+  <div class="portal-shell" :class="{ 'dark-mode': isDark }">
+    <div class="portal-card page-card page-block">
+      <div class="portal-topbar">
+        <el-button circle plain class="theme-button" @click="toggleTheme">
+          <span class="material-symbols-outlined">{{ isDark ? 'light_mode' : 'dark_mode' }}</span>
+        </el-button>
+      </div>
+>>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
       <div class="portal-title-wrap">
         <div>
           <h1>社区医院预约挂号系统</h1>
@@ -25,7 +35,11 @@
         <el-form-item>
           <div class="portal-actions">
             <el-button type="primary" :loading="loading" @click="submit">登录系统</el-button>
+<<<<<<< HEAD
             <el-button v-if="form.role !== 'admin'" @click="router.push(`/register/${form.role}`)">立即注册</el-button>
+=======
+            <el-button v-if="form.role !== 'admin'" class="keep-contrast-button" @click="router.push(`/register/${form.role}`)">立即注册</el-button>
+>>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
           </div>
         </el-form-item>
       </el-form>
@@ -37,7 +51,11 @@
 </template>
 
 <script setup>
+<<<<<<< HEAD
 import { reactive, ref } from 'vue'
+=======
+import { reactive, ref, onMounted } from 'vue'
+>>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { authApi } from '../../api/modules'
@@ -46,8 +64,23 @@ import { useAuthStore } from '../../stores/auth'
 const router = useRouter()
 const auth = useAuthStore()
 const loading = ref(false)
+<<<<<<< HEAD
 const form = reactive({ role: 'patient', username: '', password: '' })
 
+=======
+const isDark = ref(localStorage.getItem('hospital-theme') === 'dark')
+const form = reactive({ role: 'patient', username: '', password: '' })
+
+function applyTheme() {
+  document.documentElement.classList.toggle('dark-mode', isDark.value)
+  localStorage.setItem('hospital-theme', isDark.value ? 'dark' : 'light')
+}
+function toggleTheme() {
+  isDark.value = !isDark.value
+  applyTheme()
+}
+
+>>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
 async function submit() {
   if (!form.role || !form.username || !form.password) return ElMessage.warning('请完整填写登录信息')
   loading.value = true
@@ -61,4 +94,9 @@ async function submit() {
     loading.value = false
   }
 }
+<<<<<<< HEAD
+=======
+
+onMounted(applyTheme)
+>>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
 </script>

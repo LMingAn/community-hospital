@@ -11,7 +11,11 @@
         <div class="page-card page-block" style="height:100%;">
           <div class="section-title">待处理患者</div>
           <el-empty v-if="visitableRows.length === 0" description="暂无可处理患者" />
+<<<<<<< HEAD
           <div v-for="item in visitableRows" :key="item.id" class="doctor-card" :style="selected?.id===item.id?'border-color:#8fb0ea;background:#f8fbff;':''">
+=======
+          <div v-for="item in visitableRows" :key="item.id" class="doctor-card" :class="{ 'visit-selected': selected?.id === item.id }">
+>>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
             <div class="doctor-card-header">
               <div>
                 <div style="font-weight:700;">{{ item.patientName }} <span class="muted">· {{ item.gender }} · {{ item.age || '-' }}岁</span></div>
@@ -68,3 +72,10 @@ function selectRow(row) { selected.value = row; form.diagnosis=''; form.adviceHt
 async function submit() { if (!selected.value) return; await doctorApi.saveVisit({ appointmentId: selected.value.id, ...form }); successTip('就诊记录保存成功'); selected.value = null; await load() }
 load()
 </script>
+<<<<<<< HEAD
+=======
+<style scoped>
+.visit-selected { border-color: #8fb0ea; background: #f8fbff; }
+:global(.dark-mode) .visit-selected { background: rgba(114,163,255,0.08); border-color: #5e86d8; }
+</style>
+>>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
