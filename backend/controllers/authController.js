@@ -6,6 +6,42 @@ async function findOne(sql, params) {
   return rows[0] || null;
 }
 
+function createResetCode() {
+  return String(Math.floor(1000 + Math.random() * 9000));
+}
+
+function setResetSession(req, role, phone, code) {
+  req.session.passwordReset = { role, phone, code, expiresAt: Date.now() + 5 * 60 * 1000 };
+}
+
+function checkResetSession(req, role, phone, code) {
+  const token = req.session.passwordReset;
+  return token && token.role === role && token.phone === phone && token.code === code && token.expiresAt > Date.now();
+}
+
+async function sendResetCode(req, res, role, tableName, phoneField = 'phone') {
+  const { phone } = req.body;
+  if (!phone) return res.status(400).json({ success: false, message: '请输入手机号' });
+  const row = await findOne(`SELECT id FROM ${tableName} WHERE ${phoneField} = ? LIMIT 1`, [phone]);
+  if (!row) return res.status(404).json({ success: false, message: '该手机号未绑定账号' });
+  const code = createResetCode();
+  setResetSession(req, role, phone, code);
+  res.json({ success: true, message: '验证码已生成（演示环境直接展示）', data: { code } });
+}
+
+async function resetPasswordByCode(req, res, role, tableName, phoneField = 'phone') {
+  const { phone, code, newPassword } = req.body;
+  if (!phone || !code || !newPassword) return res.status(400).json({ success: false, message: '请完整填写手机号、验证码和新密码' });
+  if (!checkResetSession(req, role, phone, code)) {
+    return res.status(400).json({ success: false, message: '验证码无效或已过期' });
+  }
+  const row = await findOne(`SELECT id FROM ${tableName} WHERE ${phoneField} = ? LIMIT 1`, [phone]);
+  if (!row) return res.status(404).json({ success: false, message: '账号不存在' });
+  await pool.query(`UPDATE ${tableName} SET password_hash = ? WHERE id = ?`, [hashPassword(newPassword), row.id]);
+  delete req.session.passwordReset;
+  res.json({ success: true, message: '密码重置成功' });
+}
+
 exports.patientRegister = async (req, res, next) => {
   try {
     const { username, password, name, gender, age, phone, idCard } = req.body;
@@ -46,7 +82,9 @@ exports.patientLogout = (req, res) => {
 exports.patientProfile = async (req, res, next) => {
   try {
     const patient = await findOne(
-      'SELECT id, username, name, gender, age, phone, id_card AS idCard, balance, created_at AS createdAt FROM patients WHERE id = ?',
+      `SELECT id, username, name, gender, age, phone, id_card AS idCard, balance,
+              DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt
+       FROM patients WHERE id = ?`,
       [req.session.patient.id]
     );
     res.json({ success: true, data: patient });
@@ -64,6 +102,8 @@ exports.patientChangePassword = async (req, res, next) => {
     res.json({ success: true, message: '患者密码修改成功' });
   } catch (error) { next(error); }
 };
+exports.patientResetCode = async (req, res, next) => { try { await sendResetCode(req, res, 'patient', 'patients'); } catch (error) { next(error); } };
+exports.patientResetPassword = async (req, res, next) => { try { await resetPasswordByCode(req, res, 'patient', 'patients'); } catch (error) { next(error); } };
 
 exports.doctorRegister = async (req, res, next) => {
   try {
@@ -134,6 +174,8 @@ exports.doctorChangePassword = async (req, res, next) => {
     res.json({ success: true, message: '医生密码修改成功' });
   } catch (error) { next(error); }
 };
+exports.doctorResetCode = async (req, res, next) => { try { await sendResetCode(req, res, 'doctor', 'doctors'); } catch (error) { next(error); } };
+exports.doctorResetPassword = async (req, res, next) => { try { await resetPasswordByCode(req, res, 'doctor', 'doctors'); } catch (error) { next(error); } };
 
 exports.adminLogin = async (req, res, next) => {
   try {
@@ -156,3 +198,5 @@ exports.adminCheck = (req, res) => {
   if (!req.session.admin) return res.status(401).json({ success: false, message: '未登录' });
   res.json({ success: true, data: req.session.admin });
 };
+exports.adminResetCode = async (req, res, next) => { try { await sendResetCode(req, res, 'admin', 'admins'); } catch (error) { next(error); } };
+exports.adminResetPassword = async (req, res, next) => { try { await resetPasswordByCode(req, res, 'admin', 'admins'); } catch (error) { next(error); } };

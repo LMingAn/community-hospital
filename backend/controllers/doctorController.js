@@ -2,7 +2,7 @@ const pool = require('../config/db');
 
 exports.announcements = async (req, res, next) => {
   try {
-    const [rows] = await pool.query('SELECT id, title, content, publish_time AS publishTime FROM announcements WHERE status = 1 ORDER BY publish_time DESC');
+    const [rows] = await pool.query(`SELECT id, title, content, DATE_FORMAT(publish_time, '%Y-%m-%d %H:%i:%s') AS publishTime FROM announcements WHERE status = 1 ORDER BY publish_time DESC`);
     res.json({ success: true, data: rows });
   } catch (error) { next(error); }
 };

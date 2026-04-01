@@ -58,14 +58,14 @@ exports.listDoctors = async (req, res, next) => {
 
 exports.listPatients = async (req, res, next) => {
   try {
-    const [rows] = await pool.query('SELECT id, username, name, gender, age, phone, balance, status, created_at AS createdAt FROM patients ORDER BY id DESC');
+    const [rows] = await pool.query(`SELECT id, username, name, gender, age, phone, balance, status, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt FROM patients ORDER BY id DESC`);
     res.json({ success: true, data: rows });
   } catch (error) { next(error); }
 };
 
 exports.listAnnouncements = async (req, res, next) => {
   try {
-    const [rows] = await pool.query('SELECT id, title, content, publish_time AS publishTime, status FROM announcements ORDER BY publish_time DESC');
+    const [rows] = await pool.query(`SELECT id, title, content, DATE_FORMAT(publish_time, '%Y-%m-%d %H:%i:%s') AS publishTime, status FROM announcements ORDER BY publish_time DESC`);
     res.json({ success: true, data: rows });
   } catch (error) { next(error); }
 };
@@ -124,7 +124,7 @@ exports.listAppointments = async (req, res, next) => {
 exports.listVisits = async (req, res, next) => {
   try {
     const [rows] = await pool.query(
-      `SELECT v.id, v.diagnosis, v.prescription, v.need_hospitalization AS needHospitalization, v.created_at AS createdAt,
+      `SELECT v.id, v.diagnosis, v.prescription, v.need_hospitalization AS needHospitalization, DATE_FORMAT(v.created_at, '%Y-%m-%d %H:%i:%s') AS createdAt,
               p.name AS patientName, d.name AS doctorName, a.appointment_no AS appointmentNo
        FROM visit_records v
        JOIN patients p ON v.patient_id = p.id
@@ -139,7 +139,7 @@ exports.listVisits = async (req, res, next) => {
 exports.listHospitalizations = async (req, res, next) => {
   try {
     const [rows] = await pool.query(
-      `SELECT h.id, h.ward_no AS wardNo, h.bed_no AS bedNo, h.reason_text AS reasonText, h.status, h.created_at AS createdAt,
+      `SELECT h.id, h.ward_no AS wardNo, h.bed_no AS bedNo, h.reason_text AS reasonText, h.status, DATE_FORMAT(h.created_at, '%Y-%m-%d %H:%i:%s') AS createdAt,
               p.name AS patientName
        FROM hospitalization_records h
        JOIN patients p ON h.patient_id = p.id

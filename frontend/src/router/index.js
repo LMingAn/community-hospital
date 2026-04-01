@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 const routes = [
   { path: '/', redirect: '/portal' },
-  { path: '/portal', component: () => import('../views/public/PortalView.vue'), meta: { title: '系统门户' } },
+  { path: '/portal', component: () => import('../views/public/PortalView.vue'), meta: { title: '系统门户', guestOnly: true } },
   { path: '/login/:role(admin|doctor|patient)', component: () => import('../views/auth/LoginView.vue'), meta: { guestOnly: true, title: '登录' } },
   { path: '/register/patient', component: () => import('../views/auth/PatientRegisterView.vue'), meta: { guestOnly: true, title: '患者注册' } },
   { path: '/register/doctor', component: () => import('../views/auth/DoctorRegisterView.vue'), meta: { guestOnly: true, title: '医生注册' } },
