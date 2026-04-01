@@ -1,15 +1,16 @@
 {
-  "name": "community-hospital-system",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "community-hospital-online-appointment-system",
+  "version": "2.0.0",
+  "description": "社区医院在线预约管理系统（MySQL 8.0 版）",
+  "main": "server.js",
   "scripts": {
-    "start": "node server/app.js"
+    "start": "node server.js",
+    "dev": "node server.js",
+    "check": "node --check server.js && node --check config/db.js && node --check routes/api.js && node --check controllers/apiController.js && node --check middleware/auth.js && node --check public/js/common.js && node --check public/js/home.js && node --check public/js/booking.js && node --check public/js/query.js && node --check public/js/admin-login.js && node --check public/js/admin-dashboard.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "express": "^5.2.1"
+    "cookie-parser": "^1.4.7",
+    "express": "^4.21.2",
+    "mysql2": "^3.14.1"
   }
 }

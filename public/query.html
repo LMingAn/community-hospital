@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>预约查询 - 社区医院在线预约管理系统</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="container topbar-inner">
+    <div class="brand">社区医院在线预约管理系统<small>预约记录查询</small></div>
+    <nav class="nav">
+      <a href="/index.html">首页</a>
+      <a href="/booking.html">在线预约</a>
+      <a class="active" href="/query.html">预约查询</a>
+      <a href="/departments.html">科室与医生</a>
+      <a id="manageEntry" class="hidden" href="/admin-dashboard.html">后台管理</a>
+      <a id="loginEntry" href="/admin-login.html?returnTo=%2Fquery.html">管理员登录</a>
+      <span id="adminArea" class="hidden"><button id="logoutBtn" class="link-btn">注销</button></span>
+    </nav>
+  </div>
+</header>
+<main class="section">
+  <div class="container">
+    <div class="card">
+      <h1 class="page-title">预约查询</h1>
+      <p class="page-subtitle">输入预约时填写的手机号，即可查看当前预约状态和时间线。</p>
+      <div id="messageBox" class="notice hidden"></div>
+      <form id="queryForm">
+        <div class="form-row">
+          <div class="form-group"><label>手机号</label><input id="phone" required placeholder="请输入手机号"></div>
+          <div class="form-group" style="display:flex;align-items:flex-end;"><button class="btn" type="submit">查询预约</button></div>
+        </div>
+      </form>
+    </div>
+
+    <div id="resultWrap" class="card hidden" style="margin-top:18px;">
+      <h2>查询结果</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>预约编号</th>
+              <th>患者姓名</th>
+              <th>科室</th>
+              <th>医生</th>
+              <th>就诊时段</th>
+              <th>状态</th>
+              <th>状态时间线</th>
+            </tr>
+          </thead>
+          <tbody id="resultBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+<footer class="footer"><div class="container">支持按手机号查询本人预约记录</div></footer>
+<script src="/js/common.js"></script>
+<script src="/js/query.js"></script>
+</body>
+</html>
