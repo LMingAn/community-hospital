@@ -1,0 +1,4 @@
+<template><PageContainer title="住院登记" desc="查看需要住院的患者登记信息"><el-table :data="list" border><el-table-column prop="patientName" label="患者" width="110" /><el-table-column prop="wardNo" label="病区" width="110" /><el-table-column prop="bedNo" label="床位" width="110" /><el-table-column prop="reasonText" label="住院原因" min-width="220" /><el-table-column prop="status" label="状态" width="110"><template #default="{ row }"><span class="status-tag" :class="statusClass(row.status)">{{ row.status }}</span></template></el-table-column><el-table-column prop="createdAt" label="登记时间" min-width="180" /></el-table></PageContainer></template>
+<script setup>
+import { onMounted, ref } from 'vue'; import { adminApi } from '../../api/modules'; import PageContainer from '../../components/PageContainer.vue'; import { statusClass } from '../../utils'; const list = ref([]); onMounted(async () => { const res = await adminApi.hospitalizations(); list.value = res.data })
+</script>

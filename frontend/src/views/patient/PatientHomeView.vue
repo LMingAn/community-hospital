@@ -1,0 +1,17 @@
+<template>
+  <PageContainer title="系统公告" desc="患者可查看医院最新公告与就诊提示">
+    <el-timeline>
+      <el-timeline-item v-for="item in list" :key="item.id" :timestamp="item.publishTime?.slice?.(0, 16)">
+        <div style="font-weight:700;margin-bottom:6px;">{{ item.title }}</div>
+        <div class="muted" style="line-height:1.8;">{{ item.content }}</div>
+      </el-timeline-item>
+    </el-timeline>
+  </PageContainer>
+</template>
+<script setup>
+import { onMounted, ref } from 'vue'
+import { publicApi } from '../../api/modules'
+import PageContainer from '../../components/PageContainer.vue'
+const list = ref([])
+onMounted(async () => { const res = await publicApi.announcements(); list.value = res.data || [] })
+</script>
