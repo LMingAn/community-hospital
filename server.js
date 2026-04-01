@@ -12,24 +12,24 @@ const app = express();
 const PORT = Number(process.env.PORT || 3000);
 
 app.use(cors({ origin: true, credentials: true }));
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(session({
   secret: process.env.SESSION_SECRET || 'community-hospital-secret',
   resave: false,
   saveUninitialized: false,
-  cookie: { httpOnly: true, maxAge: 1000 * 60 * 60 * 2 }
+  cookie: { httpOnly: true, maxAge: 1000 * 60 * 60 * 3 }
 }));
 
 app.use('/api', require('./routes/publicRoutes'));
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/patient', require('./routes/patientRoutes'));
+app.use('/api/doctor', require('./routes/doctorRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/health', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT 1 AS ok');
@@ -38,11 +38,7 @@ app.get('/health', async (req, res) => {
     res.status(500).json({ success: false, message: '数据库连接失败', error: error.message });
   }
 });
-
-app.use((req, res) => {
-  res.status(404).json({ success: false, message: '请求地址不存在' });
-});
-
+app.use((req, res) => res.status(404).json({ success: false, message: '请求地址不存在' }));
 app.use((error, req, res, next) => {
   console.error(error);
   res.status(500).json({ success: false, message: '服务器内部错误', error: error.message });

@@ -27,42 +27,18 @@ function getQueryParam(name) {
   return new URLSearchParams(window.location.search).get(name);
 }
 
-async function getAdminStatus() {
-  try {
-    const res = await request('/api/admin/check');
-    return res.data;
-  } catch {
-    return null;
-  }
+function weekdayLabel(weekday) {
+  return ['','周一','周二','周三','周四','周五','周六','周日'][Number(weekday)] || '-';
 }
 
-async function mountNavState() {
-  const info = await getAdminStatus();
-  const loginEntry = document.getElementById('loginEntry');
-  const logoutEntry = document.getElementById('logoutEntry');
-  const adminName = document.getElementById('adminName');
-  if (info) {
-    if (loginEntry) loginEntry.style.display = 'none';
-    if (logoutEntry) logoutEntry.style.display = 'inline-block';
-    if (adminName) adminName.textContent = `当前管理员：${info.nickname || info.username}`;
-  } else {
-    if (loginEntry) loginEntry.style.display = 'inline-block';
-    if (logoutEntry) logoutEntry.style.display = 'none';
-    if (adminName) adminName.textContent = '当前未登录';
-  }
+function badgeClass(status) {
+  if (['已完成','启用','正常','推荐','待入院'].includes(status)) return 'success';
+  if (['已叫号','就诊中','较忙'].includes(status)) return 'warning';
+  if (['已取消','停用','停诊','高峰'].includes(status)) return 'danger';
+  return 'primary';
 }
 
-async function bindLogout() {
-  const btn = document.getElementById('logoutEntry');
-  if (!btn) return;
-  btn.addEventListener('click', async () => {
-    await request('/api/admin/logout', { method: 'POST' });
-    alert('已退出管理员登录');
-    window.location.href = '/index.html';
-  });
+function setHtml(id, html) {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = html;
 }
-
-document.addEventListener('DOMContentLoaded', async () => {
-  await mountNavState();
-  await bindLogout();
-});

@@ -1,0 +1,79 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>医生中心</title><link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<header class="header"><div class="topbar"><div class="brand"><h1>医生中心</h1><p>排班查看、患者挂号、叫号、就诊病历填写</p></div><nav class="nav"><a href="/index.html">首页</a><a href="/pages/patient.html">患者中心</a><a class="active" href="/pages/doctor.html">医生中心</a><a href="/pages/login.html">管理员登录</a><a href="/pages/admin.html">后台管理</a></nav></div></header>
+<main class="container">
+<div class="grid-2">
+  <section class="card">
+    <h3>医生登录 / 注册</h3>
+    <div id="doctorNotice" class="notice"></div>
+    <div class="grid-2">
+      <form id="doctorLoginForm" class="list-card"><strong>医生登录</strong><div class="form-group"><label>用户名</label><input name="username" required></div><div class="form-group"><label>密码</label><input name="password" type="password" required></div><button class="btn" type="submit">登录</button><button type="button" class="btn-secondary" id="doctorLogoutBtn">退出登录</button></form>
+      <form id="doctorRegisterForm" class="list-card"><strong>医生注册</strong><div class="form-row"><div class="form-group"><label>用户名</label><input name="username" required></div><div class="form-group"><label>姓名</label><input name="name" required></div></div><div class="form-row"><div class="form-group"><label>科室</label><select name="departmentId" id="doctorDeptSelect"></select></div><div class="form-group"><label>职称</label><input name="title" required></div></div><div class="form-row"><div class="form-group"><label>手机号</label><input name="phone" required></div><div class="form-group"><label>性别</label><select name="gender"><option value="男">男</option><option value="女">女</option></select></div></div><div class="form-group"><label>擅长方向</label><input name="specialty"></div><div class="form-group"><label>个人简介</label><textarea name="intro"></textarea></div><div class="form-group"><label>密码</label><input name="password" type="password" required></div><button class="btn" type="submit">注册</button></form>
+    </div>
+  </section>
+  <section class="card">
+    <h3>个人信息 / 修改密码 / 公告</h3>
+    <div id="doctorProfileBox" class="list-card muted">请先登录医生账号</div>
+    <form id="doctorPwdForm" class="list-card" style="margin-top:12px;"><strong>修改密码</strong><div class="form-row"><div class="form-group"><label>原密码</label><input name="oldPassword" type="password" required></div><div class="form-group"><label>新密码</label><input name="newPassword" type="password" required></div></div><button class="btn-secondary" type="submit">修改密码</button></form>
+    <div class="list-card" style="margin-top:12px;"><strong>系统公告</strong><div id="doctorNoticeList"></div></div>
+  </section>
+</div>
+
+<section class="grid-2" style="margin-top:22px;">
+  <div class="card"><h3>我的排班</h3><div class="table-wrap"><table><thead><tr><th>星期</th><th>时段</th><th>号源</th><th>挂号费</th><th>状态</th></tr></thead><tbody id="scheduleTable"></tbody></table></div></div>
+  <div class="card"><h3>当日挂号患者</h3><div class="form-row"><div class="form-group"><label>就诊日期</label><input id="doctorDate" type="date"></div><div class="form-group" style="display:flex;align-items:flex-end;"><button class="btn" type="button" id="loadDoctorAppointmentsBtn">查询挂号患者</button></div></div><div class="table-wrap"><table><thead><tr><th>患者</th><th>挂号信息</th><th>症状</th><th>操作</th></tr></thead><tbody id="doctorAppointmentTable"></tbody></table></div></div>
+</section>
+
+<section class="card" style="margin-top:22px;">
+  <h3>填写就诊病历</h3>
+  <div id="visitNotice" class="notice"></div>
+  <form id="visitForm">
+    <div class="form-row"><div class="form-group"><label>挂号记录 ID</label><input name="appointmentId" id="appointmentIdInput" required></div><div class="form-group"><label>诊断结果</label><input name="diagnosis" required></div></div>
+    <div class="form-group"><label>医嘱病历（富文本）</label><div class="toolbar editor-toolbar"><button type="button" onclick="document.execCommand('bold')">加粗</button><button type="button" onclick="document.execCommand('insertUnorderedList')">项目符号</button><button type="button" onclick="document.execCommand('insertParagraph')">换行</button></div><div id="adviceEditor" class="editor" contenteditable="true">请输入就诊病历与医嘱内容</div></div>
+    <div class="form-group"><label>处方</label><textarea name="prescription"></textarea></div>
+    <div class="form-row"><div class="form-group"><label><input type="checkbox" id="needHospitalization"> 需要住院登记</label></div><div class="form-group"></div></div>
+    <div id="hospitalFields" class="form-row hidden"><div class="form-group"><label>病区号</label><input name="wardNo"></div><div class="form-group"><label>床位号</label><input name="bedNo"></div></div>
+    <div id="hospitalReason" class="form-group hidden"><label>住院原因</label><input name="reasonText"></div>
+    <button class="btn" type="submit">提交就诊记录</button>
+  </form>
+</section>
+</main>
+<footer class="footer">医生端支持叫号和富文本病历填写，便于展示毕设创新点。</footer>
+<script src="/js/common.js"></script>
+<script>
+let doctorLoggedIn = false;
+async function loadDepartments() { const res = await request('/api/departments'); setHtml('doctorDeptSelect', res.data.map(i=>`<option value="${i.id}">${i.name}</option>`).join('')); }
+async function refreshDoctorProfile() {
+  try {
+    const res = await request('/api/auth/doctor/profile');
+    doctorLoggedIn = true;
+    const d = res.data;
+    setHtml('doctorProfileBox', `<p><strong>${d.name}</strong>（${d.username}）</p><p>${d.departmentName}｜${d.title}</p><p>电话：${d.phone}</p><p>擅长：${d.specialty || '-'}</p><p>${d.intro || ''}</p>`);
+    const notices = await request('/api/doctor/announcements');
+    setHtml('doctorNoticeList', notices.data.map(i=>`<div style="margin-top:8px;border-top:1px dashed #d9e2eb;padding-top:8px;"><strong>${i.title}</strong><p>${i.content}</p></div>`).join('') || '<p class="muted">暂无公告</p>');
+    await loadSchedules();
+    await loadDoctorAppointments();
+  } catch {
+    doctorLoggedIn = false;
+    setHtml('doctorProfileBox', '<div class="muted">请先登录医生账号</div>');
+    setHtml('doctorNoticeList', '<p class="muted">请先登录</p>');
+    setHtml('scheduleTable', '<tr><td colspan="5" class="muted">请先登录</td></tr>');
+    setHtml('doctorAppointmentTable', '<tr><td colspan="4" class="muted">请先登录</td></tr>');
+  }
+}
+async function loadSchedules() { const res = await request('/api/doctor/schedules'); setHtml('scheduleTable', res.data.map(i=>`<tr><td>${weekdayLabel(i.weekday)}</td><td>${i.period}</td><td>${i.maxNumber}</td><td>${i.fee}</td><td><span class="badge ${i.status ? 'success':'danger'}">${i.status ? '启用':'停用'}</span></td></tr>`).join('')); }
+async function loadDoctorAppointments() { if(!doctorLoggedIn) return; const date=document.getElementById('doctorDate').value; const res=await request(`/api/doctor/appointments?date=${date}`); setHtml('doctorAppointmentTable', res.data.map(i=>`<tr><td>${i.patientName}<br>${i.phone}</td><td>${i.visitDate} ${i.period}<br>排队号：${i.queueNo}<br><span class="badge ${badgeClass(i.status)}">${i.status}</span></td><td>${i.symptom || '-'}</td><td><button class="btn-secondary" onclick="fillVisit(${i.id})">填入病历</button> ${i.status==='待叫号'?`<button class="btn" onclick="callPatient(${i.id})">叫号</button>`:''}</td></tr>`).join('') || '<tr><td colspan="4" class="muted">暂无挂号患者</td></tr>'); }
+function fillVisit(id){ document.getElementById('appointmentIdInput').value = id; window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'}); }
+async function callPatient(id){ try{ await request(`/api/doctor/appointments/${id}/call`,{method:'PATCH'}); showNotice('doctorNotice','叫号成功','success'); loadDoctorAppointments(); }catch(err){ showNotice('doctorNotice',err.message,'error'); } }
+
+document.getElementById('doctorLoginForm').addEventListener('submit', async e=>{ e.preventDefault(); const form=new FormData(e.target); try{ await request('/api/auth/doctor/login',{method:'POST',body:JSON.stringify(Object.fromEntries(form))}); showNotice('doctorNotice','医生登录成功','success'); refreshDoctorProfile(); }catch(err){ showNotice('doctorNotice',err.message,'error'); } });
+document.getElementById('doctorRegisterForm').addEventListener('submit', async e=>{ e.preventDefault(); const form=new FormData(e.target); try{ await request('/api/auth/doctor/register',{method:'POST',body:JSON.stringify(Object.fromEntries(form))}); showNotice('doctorNotice','医生注册成功，请登录','success'); e.target.reset(); }catch(err){ showNotice('doctorNotice',err.message,'error'); } });
+document.getElementById('doctorLogoutBtn').addEventListener('click', async ()=>{ await request('/api/auth/doctor/logout',{method:'POST'}); showNotice('doctorNotice','已退出医生登录','info'); refreshDoctorProfile(); });
+document.getElementById('doctorPwdForm').addEventListener('submit', async e=>{ e.preventDefault(); const form=new FormData(e.target); try{ await request('/api/auth/doctor/password',{method:'PATCH',body:JSON.stringify(Object.fromEntries(form))}); showNotice('doctorNotice','密码修改成功','success'); e.target.reset(); }catch(err){ showNotice('doctorNotice',err.message,'error'); } });
+document.getElementById('loadDoctorAppointmentsBtn').addEventListener('click', loadDoctorAppointments);
+document.getElementById('needHospitalization').addEventListener('change', e=>{ document.getElementById('hospitalFields').classList.toggle('hidden', !e.target.checked); document.getElementById('hospitalReason').classList.toggle('hidden', !e.target.checked); });
+document.getElementById('visitForm').addEventListener('submit', async e=>{ e.preventDefault(); const form=new FormData(e.target); const payload=Object.fromEntries(form); payload.needHospitalization = document.getElementById('needHospitalization').checked; payload.adviceHtml = document.getElementById('adviceEditor').innerHTML; try{ await request('/api/doctor/visits',{method:'POST',body:JSON.stringify(payload)}); showNotice('visitNotice','就诊记录保存成功','success'); e.target.reset(); document.getElementById('adviceEditor').innerHTML='请输入就诊病历与医嘱内容'; document.getElementById('hospitalFields').classList.add('hidden'); document.getElementById('hospitalReason').classList.add('hidden'); loadDoctorAppointments(); }catch(err){ showNotice('visitNotice',err.message,'error'); } });
+document.getElementById('doctorDate').value = new Date().toISOString().slice(0,10);
+loadDepartments(); refreshDoctorProfile();
+</script>
+</body></html>
