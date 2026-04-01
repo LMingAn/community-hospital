@@ -108,23 +108,31 @@ load()
 :global(.dark-mode) .visit-card.visit-selected .doctor-card-header span:not(.status-tag) {
   color: #eef2fb !important;
 }
-:global(.dark-mode) .visit-card.visit-selected .select-patient-btn,
-:global(.dark-mode) .visit-card.visit-selected .select-patient-btn.el-button,
-:global(.dark-mode) .visit-card.visit-selected .select-patient-btn span {
+:global(.dark-mode) .visit-card.visit-selected .neutral-fixed-button {
+  background: #ffffff !important;
+  color: #111827 !important;
+  border-color: #2f2f2f !important;
+}
+@media (max-width: 1100px) {
+  .visit-layout { grid-template-columns: 1fr; }
+}
+</style>
+
+<style scoped>
+:global(html.dark-mode) .visit-card.visit-selected .select-patient-btn,
+:global(html.dark-mode) .visit-card.visit-selected .select-patient-btn.el-button,
+:global(html.dark-mode) .visit-card.visit-selected .select-patient-btn span {
   background: #ffffff !important;
   color: #111827 !important;
   border-color: #2f2f2f !important;
   opacity: 1 !important;
   box-shadow: none !important;
 }
-:global(.dark-mode) .visit-card.visit-selected .select-patient-btn:hover,
-:global(.dark-mode) .visit-card.visit-selected .select-patient-btn:focus {
+:global(html.dark-mode) .visit-card.visit-selected .select-patient-btn:hover,
+:global(html.dark-mode) .visit-card.visit-selected .select-patient-btn:focus {
   background: #ffffff !important;
   color: #111827 !important;
   border-color: #2f2f2f !important;
   opacity: 0.96 !important;
-}
-@media (max-width: 1100px) {
-  .visit-layout { grid-template-columns: 1fr; }
 }
 </style>

@@ -91,6 +91,19 @@ exports.patientProfile = async (req, res, next) => {
   } catch (error) { next(error); }
 };
 
+exports.patientUpdateProfile = async (req, res, next) => {
+  try {
+    const { name, gender, age, phone, idCard } = req.body;
+    if (!name || !phone) return res.status(400).json({ success: false, message: '姓名和手机号不能为空' });
+    const exists = await findOne('SELECT id FROM patients WHERE phone = ? AND id <> ? LIMIT 1', [phone, req.session.patient.id]);
+    if (exists) return res.status(400).json({ success: false, message: '手机号已被其他患者使用' });
+    await pool.query('UPDATE patients SET name = ?, gender = ?, age = ?, phone = ?, id_card = ? WHERE id = ?', [name, gender || '男', age || null, phone, idCard || '', req.session.patient.id]);
+    req.session.patient.name = name;
+    req.session.patient.phone = phone;
+    res.json({ success: true, message: '患者信息更新成功' });
+  } catch (error) { next(error); }
+};
+
 exports.patientChangePassword = async (req, res, next) => {
   try {
     const { oldPassword, newPassword } = req.body;
@@ -160,6 +173,16 @@ exports.doctorProfile = async (req, res, next) => {
       [req.session.doctor.id]
     );
     res.json({ success: true, data: doctor });
+  } catch (error) { next(error); }
+};
+
+exports.doctorUpdateProfile = async (req, res, next) => {
+  try {
+    const { name, gender, phone, intro } = req.body;
+    if (!name || !phone) return res.status(400).json({ success: false, message: '姓名和联系电话不能为空' });
+    await pool.query('UPDATE doctors SET name = ?, gender = ?, phone = ?, intro = ? WHERE id = ?', [name, gender || '男', phone, intro || '', req.session.doctor.id]);
+    req.session.doctor.name = name;
+    res.json({ success: true, message: '医生信息更新成功' });
   } catch (error) { next(error); }
 };
 

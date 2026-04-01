@@ -368,6 +368,7 @@ html.dark-mode .el-form-item__content,
 html.dark-mode .el-form-item__label {
   background-color: transparent;
 }
+
 html.dark-mode .select-patient-btn,
 html.dark-mode .select-patient-btn.el-button,
 html.dark-mode .select-patient-btn span,
@@ -380,10 +381,116 @@ html.dark-mode .visit-card .select-patient-btn span {
   opacity: 1 !important;
   box-shadow: none !important;
 }
-
 html.dark-mode .select-patient-btn:hover,
 html.dark-mode .select-patient-btn:focus {
   background: #ffffff !important;
   color: #111827 !important;
   border-color: #2f2f2f !important;
+}
+.toolbar { display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:16px; flex-wrap:wrap; }
+.page-split-grid { display:grid; grid-template-columns: 1.1fr 1.4fr; gap:18px; }
+@media (max-width: 1200px) { .page-split-grid { grid-template-columns: 1fr; } }
+
+
+/* Unified field and table theme handling */
+.page-card .el-table,
+.page-card .el-table th.el-table__cell,
+.page-card .el-table td.el-table__cell,
+.page-card .el-input__wrapper,
+.page-card .el-select__wrapper,
+.page-card .el-textarea__inner,
+.page-card .el-input-number,
+.page-card .el-input-group__append,
+.page-card .el-input-group__prepend,
+.page-card .el-input-number__decrease,
+.page-card .el-input-number__increase,
+.page-card .el-descriptions__body,
+.page-card .el-form-item__label,
+.page-card .el-timeline-item__content,
+.page-card .el-timeline-item__timestamp {
+  transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+}
+
+html:not(.dark-mode) .page-card .el-table,
+html:not(.dark-mode) .page-card .el-table th.el-table__cell,
+html:not(.dark-mode) .page-card .el-table td.el-table__cell,
+html:not(.dark-mode) .page-card .el-input__wrapper,
+html:not(.dark-mode) .page-card .el-select__wrapper,
+html:not(.dark-mode) .page-card .el-textarea__inner,
+html:not(.dark-mode) .page-card .el-input-number,
+html:not(.dark-mode) .page-card .el-input-group__append,
+html:not(.dark-mode) .page-card .el-input-group__prepend,
+html:not(.dark-mode) .page-card .el-input-number__decrease,
+html:not(.dark-mode) .page-card .el-input-number__increase,
+html:not(.dark-mode) .page-card .el-descriptions__body,
+html:not(.dark-mode) .page-card .el-timeline-item__content,
+html:not(.dark-mode) .page-card .el-timeline-item__timestamp {
+  background: var(--card-bg) !important;
+  color: var(--text) !important;
+  border-color: var(--line) !important;
+}
+
+html.dark-mode .page-card .el-table,
+html.dark-mode .page-card .el-table th.el-table__cell,
+html.dark-mode .page-card .el-table td.el-table__cell,
+html.dark-mode .page-card .el-input__wrapper,
+html.dark-mode .page-card .el-select__wrapper,
+html.dark-mode .page-card .el-textarea__inner,
+html.dark-mode .page-card .el-input-number,
+html.dark-mode .page-card .el-input-group__append,
+html.dark-mode .page-card .el-input-group__prepend,
+html.dark-mode .page-card .el-input-number__decrease,
+html.dark-mode .page-card .el-input-number__increase,
+html.dark-mode .page-card .el-descriptions__body,
+html.dark-mode .page-card .el-timeline-item__content,
+html.dark-mode .page-card .el-timeline-item__timestamp {
+  background: var(--input-bg) !important;
+  color: var(--text) !important;
+  border-color: var(--line) !important;
+}
+
+html.dark-mode .page-card .el-table__inner-wrapper::before,
+html.dark-mode .page-card .el-table__border-left-patch,
+html.dark-mode .page-card .el-table__border-bottom-patch,
+html.dark-mode .page-card .el-table__empty-block,
+html.dark-mode .page-card .el-table__expanded-cell,
+html.dark-mode .page-card .el-table__row,
+html.dark-mode .page-card .el-table__body-wrapper,
+html.dark-mode .page-card .el-table__header-wrapper,
+html.dark-mode .page-card .el-table__fixed,
+html.dark-mode .page-card .el-table__fixed-right,
+html.dark-mode .page-card .el-table__fixed-body-wrapper,
+html.dark-mode .page-card .el-table__fixed-header-wrapper,
+html.dark-mode .page-card .el-table__fixed-right-patch {
+  background: var(--card-bg) !important;
+}
+
+html:not(.dark-mode) .page-card .el-table__inner-wrapper::before,
+html:not(.dark-mode) .page-card .el-table__border-left-patch,
+html:not(.dark-mode) .page-card .el-table__border-bottom-patch,
+html:not(.dark-mode) .page-card .el-table__empty-block,
+html:not(.dark-mode) .page-card .el-table__expanded-cell,
+html:not(.dark-mode) .page-card .el-table__row,
+html:not(.dark-mode) .page-card .el-table__body-wrapper,
+html:not(.dark-mode) .page-card .el-table__header-wrapper,
+html:not(.dark-mode) .page-card .el-table__fixed,
+html:not(.dark-mode) .page-card .el-table__fixed-right,
+html:not(.dark-mode) .page-card .el-table__fixed-body-wrapper,
+html:not(.dark-mode) .page-card .el-table__fixed-header-wrapper,
+html:not(.dark-mode) .page-card .el-table__fixed-right-patch {
+  background: var(--card-bg) !important;
+}
+
+html.dark-mode .page-card .el-table__body tr:hover > td.el-table__cell,
+html.dark-mode .page-card .el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell,
+html.dark-mode .page-card .el-table__body tr.current-row > td.el-table__cell {
+  background: #273245 !important;
+  color: var(--text) !important;
+}
+
+html:not(.dark-mode) .page-card .el-table__body tr:hover > td.el-table__cell,
+html:not(.dark-mode) .page-card .el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell,
+html:not(.dark-mode) .page-card .el-table__body tr.current-row > td.el-table__cell {
+  background: #edf3ff !important;
+  color: var(--text) !important;
 }

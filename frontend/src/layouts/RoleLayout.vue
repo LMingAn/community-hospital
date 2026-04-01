@@ -14,8 +14,10 @@
             <span>首页</span>
             <span class="path-sep">&gt;</span>
             <span>{{ currentGroup?.title || headerTitle }}</span>
-            <span class="path-sep">&gt;</span>
-            <span>{{ route.meta.title }}</span>
+            <template v-if="route.meta.title && route.meta.title !== currentGroup?.title">
+              <span class="path-sep">&gt;</span>
+              <span>{{ route.meta.title }}</span>
+            </template>
           </div>
           <div class="header-actions">
             <el-tooltip content="黑白模式切换" placement="bottom">
@@ -52,7 +54,7 @@ const isDark = ref(localStorage.getItem('hospital-theme') === 'dark')
 let timer = null
 
 const menus = computed(() => roleMenus[route.meta.role] || [])
-const currentGroup = computed(() => menus.value.find((group) => group.tabs.some((tab) => tab.path === route.path)))
+const currentGroup = computed(() => menus.value.find((group) => (group.path && group.path === route.path) || group.tabs?.some((tab) => tab.path === route.path)))
 const headerTitle = computed(() => ({ admin: '管理员后台', doctor: '医生工作台', patient: '患者服务台' }[route.meta.role] || '系统工作台'))
 
 function applyTheme() {
