@@ -1,75 +1,82 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>社区医院在线预约管理系统</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="container topbar-inner">
-      <div class="brand">社区医院在线预约管理系统<small>毕业设计演示版</small></div>
+  <header class="header">
+    <div class="topbar">
+      <div class="brand">
+        <h1>社区医院在线预约管理系统</h1>
+        <p>本科毕业设计演示版本 · 面向社区门诊预约场景</p>
+      </div>
       <nav class="nav">
         <a class="active" href="/index.html">首页</a>
-        <a href="/booking.html">在线预约</a>
-        <a href="/query.html">预约查询</a>
-        <a href="/departments.html">科室与医生</a>
-        <a id="manageEntry" class="hidden" href="/admin-dashboard.html">后台管理</a>
-        <a id="loginEntry" href="/admin-login.html?returnTo=%2Findex.html">管理员登录</a>
-        <span id="adminArea" class="hidden"><button id="logoutBtn" class="link-btn">注销</button></span>
+        <a href="/pages/appointment.html">在线预约</a>
+        <a href="/pages/query.html">预约查询</a>
+        <a href="/pages/doctors.html">科室医生</a>
+        <a href="/pages/admin.html">后台管理</a>
+        <a id="loginEntry" href="/pages/login.html?redirect=/index.html">管理员登录</a>
+        <button id="logoutEntry" style="display:none;">注销</button>
       </nav>
     </div>
   </header>
 
-  <section class="hero">
-    <div class="container hero-inner">
-      <h1>面向社区门诊场景的在线预约与管理系统</h1>
-      <p>本系统用于完成社区医院的科室展示、医生排班查看、在线预约挂号、预约状态查询以及后台管理。页面风格保持简洁直观，适合作为本科毕业设计项目演示。</p>
-    </div>
-  </section>
-
-  <main class="section">
-    <div class="container">
-      <div class="grid-2">
-        <div class="card">
-          <h2>系统主要功能</h2>
-          <div class="grid-3">
-            <div class="kpi-box"><div class="kpi-label">用户端</div><div class="muted">预约挂号、分诊建议、查询记录</div></div>
-            <div class="kpi-box"><div class="kpi-label">医院端</div><div class="muted">医生排班、预约状态维护</div></div>
-            <div class="kpi-box"><div class="kpi-label">管理端</div><div class="muted">统计看板、预约管理</div></div>
-          </div>
-          <div style="margin-top:16px;">
-            <a class="btn" href="/booking.html">进入在线预约</a>
-            <a class="btn secondary" href="/query.html">查询已有预约</a>
-          </div>
-        </div>
-        <div class="card">
-          <h2>智能分诊建议</h2>
-          <p class="muted">输入主要症状，系统会给出推荐科室，用于体现系统的辅助决策功能。</p>
-          <form id="triageForm">
-            <div class="form-group">
-              <label for="symptom">主要症状</label>
-              <textarea id="symptom" placeholder="例如：发热、咳嗽两天，伴有喉咙痛"></textarea>
-            </div>
-            <button class="btn" type="submit">获取建议</button>
-          </form>
-          <div id="triageResult" class="notice hidden" style="margin-top:12px;"></div>
-        </div>
+  <main class="container">
+    <section class="banner">
+      <div>
+        <h2>让社区门诊预约更加规范、清晰、便捷</h2>
+        <p>本系统面向社区医院日常预约场景，围绕患者预约、分诊建议、医生排班、后台管理和预约状态管理等核心业务进行设计与实现，适合作为本科毕业设计项目展示。</p>
+        <ul class="hero-list">
+          <li>支持多页面预约流程，操作清晰，适合答辩演示</li>
+          <li>支持智能分诊建议、预约状态时间线、排班停诊管理</li>
+          <li>采用 Node.js + Express + MySQL 8.0 架构，前后端同源联通</li>
+        </ul>
+        <p>
+          <a class="btn" href="/pages/appointment.html">立即预约</a>
+          <a class="btn-secondary" href="/pages/doctors.html">查看科室医生</a>
+        </p>
       </div>
-
-      <div style="margin-top:24px;">
-        <h2 class="page-title">科室概览</h2>
-        <p class="page-subtitle">首页仅展示部分内容，详细信息可前往“科室与医生”分页查看。</p>
-        <div id="deptList" class="grid-3"></div>
+      <div class="card">
+        <h3>系统特色</h3>
+        <p>1. 患者可以根据科室、医生、排班日期和时段进行预约。</p>
+        <p>2. 管理员可查看统计数据、调整预约状态、管理排班停诊状态。</p>
+        <p>3. 系统突出社区医院场景，避免页面过度炫技，更注重业务完整性。</p>
+        <p id="adminName" class="muted">当前未登录</p>
       </div>
-    </div>
+    </section>
+
+    <section class="panel-grid">
+      <div class="card">
+        <h3>患者端功能</h3>
+        <p>在线预约、预约查询、预约取消、分诊建议、时间线查询。</p>
+      </div>
+      <div class="card">
+        <h3>管理端功能</h3>
+        <p>管理员登录、预约状态修改、排班停诊设置、数据统计看板。</p>
+      </div>
+      <div class="card">
+        <h3>毕业设计亮点</h3>
+        <p>多角色、多页面、数据库持久化、异常校验、前后端接口统一。</p>
+      </div>
+    </section>
+
+    <section style="margin-top:22px;" class="grid-2">
+      <div class="card">
+        <h3>适合论文展开的内容</h3>
+        <p>系统分析、系统设计、数据库设计、流程设计、系统测试等章节都可以围绕当前功能完整展开。</p>
+      </div>
+      <div class="card">
+        <h3>建议演示流程</h3>
+        <p>首页 → 科室医生 → 在线预约 → 预约查询 → 管理员登录 → 后台管理 → 修改预约状态。</p>
+      </div>
+    </section>
   </main>
 
-  <footer class="footer">
-    <div class="container">社区医院在线预约管理系统 © 2026</div>
-  </footer>
+  <footer class="footer">社区医院在线预约管理系统 © 毕业设计演示项目</footer>
   <script src="/js/common.js"></script>
-  <script src="/js/home.js"></script>
 </body>
 </html>

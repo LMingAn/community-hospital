@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>科室与医生</title><link rel="stylesheet" href="/css/style.css" /></head>
+<body>
+<header class="header"><div class="topbar"><div class="brand"><h1>科室与医生</h1><p>查看社区医院科室和医生信息</p></div><nav class="nav"><a href="/index.html">首页</a><a href="/pages/appointment.html">在线预约</a><a href="/pages/query.html">预约查询</a><a class="active" href="/pages/doctors.html">科室医生</a><a href="/pages/admin.html">后台管理</a><a id="loginEntry" href="/pages/login.html?redirect=/pages/doctors.html">管理员登录</a><button id="logoutEntry" style="display:none;">注销</button></nav></div></header>
+<main class="container">
+  <div class="card"><h3>科室列表</h3><div id="departments" class="grid-3"></div></div>
+  <div class="card" style="margin-top:18px;"><h3>医生列表</h3><div id="doctors" class="grid-2"></div></div>
+</main>
+<footer class="footer">医生排班可在后台管理页面查看和调整</footer>
+<script src="/js/common.js"></script>
+<script>
+async function init() {
+  const depRes = await request('/api/departments');
+  document.getElementById('departments').innerHTML = depRes.data.map(dep => `<div class="card"><h3>${dep.name}</h3><p>${dep.description}</p><p class="muted">位置：${dep.location}</p></div>`).join('');
+  const doctorRes = await request('/api/doctors');
+  document.getElementById('doctors').innerHTML = doctorRes.data.map(doc => `<div class="card"><h3>${doc.name}（${doc.title}）</h3><p><strong>所属科室：</strong>${doc.departmentName}</p><p><strong>擅长方向：</strong>${doc.specialty}</p><p>${doc.intro}</p></div>`).join('');
+}
+init();
+</script>
+</body>
+</html>

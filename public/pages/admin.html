@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>后台管理</title><link rel="stylesheet" href="/css/style.css" /></head>
+<body>
+<header class="header"><div class="topbar"><div class="brand"><h1>后台管理</h1><p>管理员可查看统计、排班与预约状态</p></div><nav class="nav"><a href="/index.html">首页</a><a href="/pages/appointment.html">在线预约</a><a href="/pages/query.html">预约查询</a><a href="/pages/doctors.html">科室医生</a><a class="active" href="/pages/admin.html">后台管理</a><a id="loginEntry" href="/pages/login.html?redirect=/pages/admin.html">管理员登录</a><button id="logoutEntry" style="display:none;">注销</button></nav></div></header>
+<main class="container">
+  <div id="adminNotice" class="notice"></div>
+  <section class="stats-grid" id="statsBox"></section>
+  <section class="card" style="margin-top:18px;"><h3>最新预约记录</h3><div class="table-wrap"><table><thead><tr><th>预约单号</th><th>患者</th><th>科室/医生</th><th>时间</th><th>状态</th><th>变更状态</th></tr></thead><tbody id="recentTable"></tbody></table></div></section>
+  <section class="card" style="margin-top:18px;"><h3>医生排班管理</h3><div class="table-wrap"><table><thead><tr><th>医生</th><th>日期/时段</th><th>号源</th><th>状态</th><th>操作</th></tr></thead><tbody id="scheduleTable"></tbody></table></div></section>
+</main>
+<footer class="footer">后台管理功能建议作为答辩重点演示内容之一</footer>
+<script src="/js/common.js"></script>
+<script>
+async function ensureLogin() {
+  const admin = await getAdminStatus();
+  if (!admin) {
+    window.location.href = `/pages/login.html?redirect=${encodeURIComponent('/pages/admin.html')}`;
+    return false;
+  }
+  return true;
+}
+async function loadStats() {
+  const res = await request('/api/admin/stats');
+  const d = res.data;
+  document.getElementById('statsBox').innerHTML = `
+    <div class="stat-card"><div>预约总数</div><strong>${d.appointmentCount}</strong></div>
+    <div class="stat-card"><div>今日就诊</div><strong>${d.todayCount}</strong></div>
+    <div class="stat-card"><div>在岗医生</div><strong>${d.doctorCount}</strong></div>
+    <div class="stat-card"><div>科室数量</div><strong>${d.departmentCount}</strong></div>`;
+  document.getElementById('recentTable').innerHTML = d.recentAppointments.map(row => `<tr>
+    <td>${row.appointmentNo}</td><td>${row.patientName}<br><span class="muted">${row.phone}</span></td><td>${row.departmentName}<br>${row.doctorName}</td><td>${row.visitDate} ${row.period}</td><td>${row.status}</td>
+    <td>
+      <select id="status-${row.id}">
+        <option value="待就诊" ${row.status === '待就诊' ? 'selected' : ''}>待就诊</option><option value="已签到" ${row.status === '已签到' ? 'selected' : ''}>已签到</option><option value="就诊中" ${row.status === '就诊中' ? 'selected' : ''}>就诊中</option><option value="已完成" ${row.status === '已完成' ? 'selected' : ''}>已完成</option><option value="已取消" ${row.status === '已取消' ? 'selected' : ''}>已取消</option>
+      </select>
+      <button class="btn-secondary" onclick="updateStatus(${row.id})">提交</button>
+    </td></tr>`).join('');
+}
+async function loadSchedules() {
+  const res = await request('/api/admin/schedules');
+  document.getElementById('scheduleTable').innerHTML = res.data.map(row => `<tr>
+    <td>${row.departmentName}<br>${row.doctorName}</td>
+    <td>${row.scheduleDate} ${row.period}</td>
+    <td>${row.bookedNumber}/${row.maxNumber}，挂号费${row.fee}</td>
+    <td>${row.status === 'available' ? '可预约' : '停诊'}</td>
+    <td><button class="btn-secondary" onclick="toggleSchedule(${row.id}, '${row.status === 'available' ? 'stopped' : 'available'}')">${row.status === 'available' ? '设为停诊' : '恢复预约'}</button></td>
+  </tr>`).join('');
+}
+async function updateStatus(id) {
+  const status = document.getElementById(`status-${id}`).value;
+  await request(`/api/admin/appointments/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
+  alert('状态更新成功');
+  loadStats();
+}
+async function toggleSchedule(id, status) {
+  await request(`/api/admin/schedules/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
+  alert('排班状态已更新');
+  loadSchedules();
+}
+(async () => {
+  if (!await ensureLogin()) return;
+  await loadStats();
+  await loadSchedules();
+})();
+</script>
+</body>
+</html>

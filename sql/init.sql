@@ -1,17 +1,13 @@
-CREATE DATABASE IF NOT EXISTS community_hospital_system CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE community_hospital_system;
-
-DROP TABLE IF EXISTS appointments;
-DROP TABLE IF EXISTS schedules;
-DROP TABLE IF EXISTS doctors;
-DROP TABLE IF EXISTS departments;
-DROP TABLE IF EXISTS admins;
+DROP DATABASE IF EXISTS community_hospital;
+CREATE DATABASE community_hospital DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE community_hospital;
 
 CREATE TABLE departments (
   id INT PRIMARY KEY AUTO_INCREMENT,
   name VARCHAR(50) NOT NULL,
-  introduction VARCHAR(255) NOT NULL,
-  floor_no VARCHAR(20) NOT NULL
+  description VARCHAR(255),
+  location VARCHAR(100),
+  status TINYINT NOT NULL DEFAULT 1
 );
 
 CREATE TABLE doctors (
@@ -19,71 +15,80 @@ CREATE TABLE doctors (
   department_id INT NOT NULL,
   name VARCHAR(50) NOT NULL,
   title VARCHAR(50) NOT NULL,
-  specialty VARCHAR(255) NOT NULL,
-  photo VARCHAR(255) DEFAULT '',
-  CONSTRAINT fk_doctors_department FOREIGN KEY (department_id) REFERENCES departments(id)
+  specialty VARCHAR(255),
+  intro TEXT,
+  avatar VARCHAR(255) DEFAULT '',
+  status TINYINT NOT NULL DEFAULT 1,
+  CONSTRAINT fk_doctor_department FOREIGN KEY (department_id) REFERENCES departments(id)
 );
 
-CREATE TABLE schedules (
+CREATE TABLE doctor_schedules (
   id INT PRIMARY KEY AUTO_INCREMENT,
   doctor_id INT NOT NULL,
-  work_date DATE NOT NULL,
-  time_period VARCHAR(50) NOT NULL,
-  total_count INT NOT NULL,
-  remaining_count INT NOT NULL,
-  CONSTRAINT fk_schedules_doctor FOREIGN KEY (doctor_id) REFERENCES doctors(id)
+  schedule_date DATE NOT NULL,
+  period ENUM('上午','下午','夜间') NOT NULL,
+  max_number INT NOT NULL DEFAULT 20,
+  booked_number INT NOT NULL DEFAULT 0,
+  fee DECIMAL(10,2) NOT NULL DEFAULT 15.00,
+  status ENUM('available','stopped') NOT NULL DEFAULT 'available',
+  CONSTRAINT fk_schedule_doctor FOREIGN KEY (doctor_id) REFERENCES doctors(id)
 );
 
 CREATE TABLE appointments (
   id INT PRIMARY KEY AUTO_INCREMENT,
-  appointment_no VARCHAR(30) NOT NULL UNIQUE,
+  appointment_no VARCHAR(40) NOT NULL UNIQUE,
   patient_name VARCHAR(50) NOT NULL,
-  gender VARCHAR(10) NOT NULL,
-  age INT NOT NULL,
+  gender VARCHAR(10),
+  age INT,
   phone VARCHAR(20) NOT NULL,
-  id_card VARCHAR(30) DEFAULT '',
+  id_card VARCHAR(30),
+  symptom TEXT,
   department_id INT NOT NULL,
   doctor_id INT NOT NULL,
   schedule_id INT NOT NULL,
-  symptom TEXT NOT NULL,
-  status VARCHAR(20) NOT NULL DEFAULT '待就诊',
+  visit_date DATE NOT NULL,
+  period ENUM('上午','下午','夜间') NOT NULL,
+  status ENUM('待就诊','已签到','就诊中','已完成','已取消') NOT NULL DEFAULT '待就诊',
   created_at DATETIME NOT NULL,
-  CONSTRAINT fk_appointments_department FOREIGN KEY (department_id) REFERENCES departments(id),
-  CONSTRAINT fk_appointments_doctor FOREIGN KEY (doctor_id) REFERENCES doctors(id),
-  CONSTRAINT fk_appointments_schedule FOREIGN KEY (schedule_id) REFERENCES schedules(id)
+  CONSTRAINT fk_appointment_department FOREIGN KEY (department_id) REFERENCES departments(id),
+  CONSTRAINT fk_appointment_doctor FOREIGN KEY (doctor_id) REFERENCES doctors(id),
+  CONSTRAINT fk_appointment_schedule FOREIGN KEY (schedule_id) REFERENCES doctor_schedules(id)
+);
+
+CREATE TABLE appointment_logs (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  appointment_id INT NOT NULL,
+  action VARCHAR(50) NOT NULL,
+  remark VARCHAR(255),
+  created_at DATETIME NOT NULL,
+  CONSTRAINT fk_log_appointment FOREIGN KEY (appointment_id) REFERENCES appointments(id)
 );
 
 CREATE TABLE admins (
   id INT PRIMARY KEY AUTO_INCREMENT,
   username VARCHAR(50) NOT NULL UNIQUE,
-  password VARCHAR(100) NOT NULL
+  password_hash VARCHAR(64) NOT NULL,
+  nickname VARCHAR(50) NOT NULL
 );
 
-INSERT INTO departments (name, introduction, floor_no) VALUES
-('全科门诊', '负责社区常见病、多发病的初步接诊与转诊。', '1层'),
-('内科', '处理发热、消化、血压等常见内科问题。', '2层'),
-('外科', '处理外伤、扭伤、浅表手术等情况。', '2层'),
-('儿科', '儿童常见疾病诊断与健康咨询。', '3层'),
-('妇科', '妇科基础检查、月经与孕期咨询。', '3层'),
-('皮肤科', '处理皮疹、过敏、瘙痒等皮肤问题。', '3层');
+INSERT INTO departments (name, description, location) VALUES
+('全科门诊', '处理常见病、多发病及基础健康咨询。', '门诊楼 1 层 A 区'),
+('慢病管理科', '提供高血压、糖尿病等慢性病随访和管理。', '门诊楼 2 层 B 区'),
+('儿保门诊', '提供儿童保健、疫苗咨询和基础检查。', '门诊楼 1 层 C 区');
 
-INSERT INTO doctors (department_id, name, title, specialty, photo) VALUES
-(1, '张文静', '主治医师', '擅长发热、感冒、慢病管理与家庭医生服务。', ''),
-(2, '刘建华', '副主任医师', '擅长高血压、胃肠不适、常见内科疾病。', ''),
-(3, '陈志强', '主治医师', '擅长软组织损伤、创面处理、关节疼痛。', ''),
-(4, '李欣悦', '主治医师', '擅长儿童发热、咳嗽及常规保健指导。', ''),
-(5, '王晓琳', '副主任医师', '擅长月经异常、孕期咨询、妇科基础诊疗。', ''),
-(6, '周敏', '主治医师', '擅长皮炎、过敏、湿疹、常见皮肤病诊疗。', '');
+INSERT INTO doctors (department_id, name, title, specialty, intro) VALUES
+(1, '王丽', '主治医师', '发热、咳嗽、胃肠不适等常见病诊疗', '从事基层全科诊疗工作多年，擅长社区常见病初步诊疗与转诊建议。'),
+(1, '张强', '住院医师', '呼吸道疾病、普通感冒、基础体检', '熟悉社区居民门诊接诊流程，擅长轻症初筛与健康宣教。'),
+(2, '李敏', '副主任医师', '高血压、糖尿病、慢病随访', '长期从事慢病管理工作，熟悉血压、血糖长期控制方案。'),
+(3, '陈晨', '主治医师', '儿童保健、疫苗接种咨询', '擅长儿童成长评估、营养指导及预防接种相关咨询。');
 
-INSERT INTO schedules (doctor_id, work_date, time_period, total_count, remaining_count) VALUES
-(1, '2026-03-07', '08:30-10:00', 12, 10),
-(1, '2026-03-07', '10:00-11:30', 12, 6),
-(2, '2026-03-07', '08:30-10:00', 10, 3),
-(2, '2026-03-07', '14:00-15:30', 10, 8),
-(3, '2026-03-08', '09:00-11:00', 8, 5),
-(4, '2026-03-08', '14:00-16:00', 10, 9),
-(5, '2026-03-09', '08:30-10:30', 8, 4),
-(6, '2026-03-09', '14:30-16:00', 10, 2);
+INSERT INTO doctor_schedules (doctor_id, schedule_date, period, max_number, booked_number, fee, status) VALUES
+(1, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '上午', 20, 3, 15.00, 'available'),
+(1, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '下午', 15, 4, 15.00, 'available'),
+(2, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '上午', 15, 2, 12.00, 'available'),
+(3, DATE_ADD(CURDATE(), INTERVAL 1 DAY), '下午', 18, 6, 20.00, 'available'),
+(3, DATE_ADD(CURDATE(), INTERVAL 3 DAY), '上午', 18, 0, 20.00, 'available'),
+(4, DATE_ADD(CURDATE(), INTERVAL 2 DAY), '上午', 16, 5, 18.00, 'available');
 
-INSERT INTO admins (username, password) VALUES
-('admin', '123456');
+INSERT INTO admins (username, password_hash, nickname) VALUES
+('admin', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '系统管理员');

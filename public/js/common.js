@@ -1,61 +1,68 @@
 async function request(url, options = {}) {
   const response = await fetch(url, {
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
-    credentials: 'same-origin',
-    ...options,
+    ...options
   });
   const data = await response.json();
-  if (!response.ok || data.success === false) {
-    throw new Error(data.message || '请求失败');
-  }
+  if (!response.ok) throw new Error(data.message || '请求失败');
   return data;
 }
 
-function showMessage(el, message, type = 'success') {
-  el.className = `notice ${type}`;
+function showNotice(id, message, type = 'info') {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = `notice show ${type}`;
   el.textContent = message;
-  el.classList.remove('hidden');
 }
 
-function hideMessage(el) {
-  el.classList.add('hidden');
+function clearNotice(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = 'notice';
+  el.textContent = '';
 }
 
-function getQuery(name) {
-  const params = new URLSearchParams(window.location.search);
-  return params.get(name);
+function getQueryParam(name) {
+  return new URLSearchParams(window.location.search).get(name);
 }
 
-async function refreshAdminUI() {
-  const adminArea = document.getElementById('adminArea');
-  const loginEntry = document.getElementById('loginEntry');
-  const manageEntry = document.getElementById('manageEntry');
-  const logoutBtn = document.getElementById('logoutBtn');
-  if (!adminArea || !loginEntry || !manageEntry || !logoutBtn) return;
-
+async function getAdminStatus() {
   try {
-    const res = await request('/api/session');
-    if (res.isAdminLoggedIn) {
-      adminArea.classList.remove('hidden');
-      loginEntry.classList.add('hidden');
-      manageEntry.classList.remove('hidden');
-    } else {
-      adminArea.classList.add('hidden');
-      loginEntry.classList.remove('hidden');
-      manageEntry.classList.add('hidden');
-    }
-  } catch (error) {
-    console.error(error.message);
+    const res = await request('/api/admin/check');
+    return res.data;
+  } catch {
+    return null;
   }
-
-  logoutBtn.onclick = async () => {
-    try {
-      await request('/api/admin/logout', { method: 'POST' });
-      window.location.href = '/index.html';
-    } catch (error) {
-      alert(error.message);
-    }
-  };
 }
 
-document.addEventListener('DOMContentLoaded', refreshAdminUI);
+async function mountNavState() {
+  const info = await getAdminStatus();
+  const loginEntry = document.getElementById('loginEntry');
+  const logoutEntry = document.getElementById('logoutEntry');
+  const adminName = document.getElementById('adminName');
+  if (info) {
+    if (loginEntry) loginEntry.style.display = 'none';
+    if (logoutEntry) logoutEntry.style.display = 'inline-block';
+    if (adminName) adminName.textContent = `当前管理员：${info.nickname || info.username}`;
+  } else {
+    if (loginEntry) loginEntry.style.display = 'inline-block';
+    if (logoutEntry) logoutEntry.style.display = 'none';
+    if (adminName) adminName.textContent = '当前未登录';
+  }
+}
+
+async function bindLogout() {
+  const btn = document.getElementById('logoutEntry');
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    await request('/api/admin/logout', { method: 'POST' });
+    alert('已退出管理员登录');
+    window.location.href = '/index.html';
+  });
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await mountNavState();
+  await bindLogout();
+});
