@@ -3,7 +3,7 @@ const { weekdayOf, triageBySymptom } = require('./helpers');
 
 exports.getAnnouncements = async (req, res, next) => {
   try {
-    const [rows] = await pool.query(`SELECT id, title, content, DATE_FORMAT(publish_time, '%Y-%m-%d %H:%i:%s') AS publishTime FROM announcements WHERE status = 1 ORDER BY publish_time DESC LIMIT 10`);
+    const [rows] = await pool.query(`SELECT id, title, content, DATE_FORMAT(published_at, '%Y-%m-%d %H:%i:%s') AS publishTime FROM announcements WHERE status = 1 ORDER BY published_at DESC LIMIT 10`);
     res.json({ success: true, data: rows });
   } catch (error) { next(error); }
 };
@@ -21,14 +21,14 @@ exports.getTodayDoctors = async (req, res, next) => {
     const targetDate = date || new Date().toISOString().slice(0, 10);
     const weekday = weekdayOf(targetDate);
     const [rows] = await pool.query(
-      `SELECT w.id AS scheduleId, w.weekday, w.period, w.max_number AS maxNumber, w.fee,
-              d.id AS doctorId, d.name AS doctorName, d.title, d.specialty, d.intro,
+      `SELECT w.id AS scheduleId, w.weekday, w.period, w.max_slots AS maxNumber, w.fee,
+              d.id AS doctorId, d.name AS doctorName, d.title, d.specialty, d.profile AS intro,
               dp.id AS departmentId, dp.name AS departmentName,
               (SELECT COUNT(*) FROM appointments a
                WHERE a.doctor_id = d.id AND a.visit_date = ? AND a.period = w.period AND a.status <> '已取消') AS bookedNumber
        FROM weekly_schedules w
        JOIN doctors d ON w.doctor_id = d.id
-       JOIN departments dp ON d.department_id = dp.id
+       JOIN departments dp ON d.dept_id = dp.id
        WHERE w.weekday = ? AND w.status = 1 AND d.status = 1
        ORDER BY dp.id, d.id, FIELD(w.period, '上午','下午','夜间')`,
       [targetDate, weekday]

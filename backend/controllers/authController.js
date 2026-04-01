@@ -51,7 +51,7 @@ exports.patientRegister = async (req, res, next) => {
     const exists = await findOne('SELECT id FROM patients WHERE username = ? OR phone = ? LIMIT 1', [username, phone]);
     if (exists) return res.status(400).json({ success: false, message: '用户名或手机号已存在' });
     await pool.query(
-      `INSERT INTO patients (username, password_hash, name, gender, age, phone, id_card, balance)
+      `INSERT INTO patients (username, password_hash, name, gender, age, phone, identity_card_no, balance)
        VALUES (?, ?, ?, ?, ?, ?, ?, 0)`,
       [username, hashPassword(password), name, gender || '男', age || null, phone, idCard || '']
     );
@@ -82,7 +82,7 @@ exports.patientLogout = (req, res) => {
 exports.patientProfile = async (req, res, next) => {
   try {
     const patient = await findOne(
-      `SELECT id, username, name, gender, age, phone, id_card AS idCard, balance,
+      `SELECT id, username, name, gender, age, phone, identity_card_no AS idCard, balance,
               DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt
        FROM patients WHERE id = ?`,
       [req.session.patient.id]
@@ -97,7 +97,7 @@ exports.patientUpdateProfile = async (req, res, next) => {
     if (!name || !phone) return res.status(400).json({ success: false, message: '姓名和手机号不能为空' });
     const exists = await findOne('SELECT id FROM patients WHERE phone = ? AND id <> ? LIMIT 1', [phone, req.session.patient.id]);
     if (exists) return res.status(400).json({ success: false, message: '手机号已被其他患者使用' });
-    await pool.query('UPDATE patients SET name = ?, gender = ?, age = ?, phone = ?, id_card = ? WHERE id = ?', [name, gender || '男', age || null, phone, idCard || '', req.session.patient.id]);
+    await pool.query('UPDATE patients SET name = ?, gender = ?, age = ?, phone = ?, identity_card_no = ? WHERE id = ?', [name, gender || '男', age || null, phone, idCard || '', req.session.patient.id]);
     req.session.patient.name = name;
     req.session.patient.phone = phone;
     res.json({ success: true, message: '患者信息更新成功' });
@@ -120,16 +120,16 @@ exports.patientResetPassword = async (req, res, next) => { try { await resetPass
 
 exports.doctorRegister = async (req, res, next) => {
   try {
-    const { username, password, name, gender, departmentId, title, specialty, phone, intro } = req.body;
+    const { username, password, name, gender, departmentId, title, specialty, phone, intro, profile } = req.body;
     if (!username || !password || !name || !departmentId || !title || !phone) {
       return res.status(400).json({ success: false, message: '请完整填写医生注册信息' });
     }
     const exists = await findOne('SELECT id FROM doctors WHERE username = ? LIMIT 1', [username]);
     if (exists) return res.status(400).json({ success: false, message: '医生账号已存在' });
     await pool.query(
-      `INSERT INTO doctors (department_id, username, password_hash, name, gender, title, specialty, phone, intro, status)
+      `INSERT INTO doctors (dept_id, username, password_hash, name, gender, title, specialty, phone, profile, status)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
-      [departmentId, username, hashPassword(password), name, gender || '男', title, specialty || '', phone, intro || '']
+      [departmentId, username, hashPassword(password), name, gender || '男', title, specialty || '', phone, intro || profile || '']
     );
     res.json({ success: true, message: '医生注册成功，请登录' });
   } catch (error) { next(error); }
@@ -139,9 +139,9 @@ exports.doctorLogin = async (req, res, next) => {
   try {
     const { username, password } = req.body;
     const doctor = await findOne(
-      `SELECT d.id, d.username, d.name, d.title, d.department_id AS departmentId, dp.name AS departmentName,
+      `SELECT d.id, d.username, d.name, d.title, d.dept_id AS departmentId, dp.name AS departmentName,
               d.password_hash AS passwordHash
-       FROM doctors d LEFT JOIN departments dp ON d.department_id = dp.id
+       FROM doctors d LEFT JOIN departments dp ON d.dept_id = dp.id
        WHERE d.username = ? LIMIT 1`, [username]
     );
     if (!doctor || doctor.passwordHash !== hashPassword(password)) {
@@ -167,9 +167,9 @@ exports.doctorLogout = (req, res) => {
 exports.doctorProfile = async (req, res, next) => {
   try {
     const doctor = await findOne(
-      `SELECT d.id, d.username, d.name, d.gender, d.title, d.specialty, d.phone, d.intro,
-              d.department_id AS departmentId, dp.name AS departmentName
-       FROM doctors d LEFT JOIN departments dp ON d.department_id = dp.id WHERE d.id = ?`,
+      `SELECT d.id, d.username, d.name, d.gender, d.title, d.specialty, d.phone, d.profile AS intro,
+              d.dept_id AS departmentId, dp.name AS departmentName
+       FROM doctors d LEFT JOIN departments dp ON d.dept_id = dp.id WHERE d.id = ?`,
       [req.session.doctor.id]
     );
     res.json({ success: true, data: doctor });
@@ -180,7 +180,7 @@ exports.doctorUpdateProfile = async (req, res, next) => {
   try {
     const { name, gender, phone, intro } = req.body;
     if (!name || !phone) return res.status(400).json({ success: false, message: '姓名和联系电话不能为空' });
-    await pool.query('UPDATE doctors SET name = ?, gender = ?, phone = ?, intro = ? WHERE id = ?', [name, gender || '男', phone, intro || '', req.session.doctor.id]);
+    await pool.query('UPDATE doctors SET name = ?, gender = ?, phone = ?, profile = ? WHERE id = ?', [name, gender || '男', phone, intro || '', req.session.doctor.id]);
     req.session.doctor.name = name;
     res.json({ success: true, message: '医生信息更新成功' });
   } catch (error) { next(error); }

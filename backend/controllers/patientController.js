@@ -6,14 +6,14 @@ exports.todayDoctors = async (req, res, next) => {
     const date = req.query.date || new Date().toISOString().slice(0, 10);
     const weekday = weekdayOf(date);
     const [rows] = await pool.query(
-      `SELECT w.id AS scheduleId, w.period, w.max_number AS maxNumber, w.fee,
+      `SELECT w.id AS scheduleId, w.period, w.max_slots AS maxNumber, w.fee,
               d.id AS doctorId, d.name AS doctorName, d.title, d.specialty,
               dp.id AS departmentId, dp.name AS departmentName,
               (SELECT COUNT(*) FROM appointments a
                 WHERE a.doctor_id = d.id AND a.visit_date = ? AND a.period = w.period AND a.status <> '已取消') AS bookedNumber
        FROM weekly_schedules w
        JOIN doctors d ON w.doctor_id = d.id
-       JOIN departments dp ON dp.id = d.department_id
+       JOIN departments dp ON dp.id = d.dept_id
        WHERE w.weekday = ? AND w.status = 1 AND d.status = 1
        ORDER BY dp.id, d.id, FIELD(w.period, '上午','下午','夜间')`, [date, weekday]
     );
@@ -32,7 +32,7 @@ exports.createAppointment = async (req, res, next) => {
     await conn.beginTransaction();
     const weekday = weekdayOf(visitDate);
     const [scheduleRows] = await conn.query(
-      `SELECT id, max_number AS maxNumber, fee, status FROM weekly_schedules
+      `SELECT id, max_slots AS maxNumber, fee, status FROM weekly_schedules
        WHERE doctor_id = ? AND weekday = ? AND period = ? FOR UPDATE`, [doctorId, weekday, period]
     );
     if (!scheduleRows.length || !scheduleRows[0].status) {
@@ -60,7 +60,7 @@ exports.createAppointment = async (req, res, next) => {
     const appointmentNo = `YY${Date.now()}${Math.floor(Math.random() * 90 + 10)}`;
     const triage = triageBySymptom(symptom || '');
     const [result] = await conn.query(
-      `INSERT INTO appointments (appointment_no, patient_id, doctor_id, department_id, visit_date, period, queue_no, fee, symptom, triage_result, status)
+      `INSERT INTO appointments (appointment_no, patient_id, doctor_id, dept_id, visit_date, period, queue_number, fee, symptom, triage_advice, status)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '待叫号')`,
       [appointmentNo, patientId, doctorId, departmentId, visitDate, period, queueNo, schedule.fee, symptom || '', triage.department]
     );
@@ -105,11 +105,11 @@ exports.cancelAppointment = async (req, res, next) => {
 exports.myAppointments = async (req, res, next) => {
   try {
     const [rows] = await pool.query(
-      `SELECT a.id, a.appointment_no AS appointmentNo, a.visit_date AS visitDate, a.period, a.queue_no AS queueNo, a.fee, a.symptom,
-              a.triage_result AS triageResult, a.status, d.name AS doctorName, d.title, dp.name AS departmentName
+      `SELECT a.id, a.appointment_no AS appointmentNo, a.visit_date AS visitDate, a.period, a.queue_number AS queueNo, a.fee, a.symptom,
+              a.triage_advice AS triageResult, a.status, d.name AS doctorName, d.title, dp.name AS departmentName
        FROM appointments a
        JOIN doctors d ON a.doctor_id = d.id
-       JOIN departments dp ON a.department_id = dp.id
+       JOIN departments dp ON a.dept_id = dp.id
        WHERE a.patient_id = ?
        ORDER BY a.visit_date DESC, FIELD(a.period, '上午','下午','夜间')`, [req.session.patient.id]
     );
@@ -120,7 +120,7 @@ exports.myAppointments = async (req, res, next) => {
 exports.myVisits = async (req, res, next) => {
   try {
     const [rows] = await pool.query(
-      `SELECT v.id, v.diagnosis, v.advice_html AS adviceHtml, v.prescription, v.need_hospitalization AS needHospitalization,
+      `SELECT v.id, v.diagnosis, v.advice_content_html AS adviceHtml, v.prescription, v.need_inpatient AS needHospitalization,
               DATE_FORMAT(v.created_at, '%Y-%m-%d %H:%i:%s') AS createdAt, d.name AS doctorName, a.appointment_no AS appointmentNo, a.visit_date AS visitDate
        FROM visit_records v
        JOIN doctors d ON v.doctor_id = d.id
@@ -135,10 +135,10 @@ exports.myVisits = async (req, res, next) => {
 exports.myHospitalizations = async (req, res, next) => {
   try {
     const [rows] = await pool.query(
-      `SELECT h.id, h.ward_no AS wardNo, h.bed_no AS bedNo, h.reason_text AS reasonText, h.status, DATE_FORMAT(h.created_at, '%Y-%m-%d %H:%i:%s') AS createdAt,
+      `SELECT h.id, h.ward_no AS wardNo, h.bed_no AS bedNo, h.admission_reason AS reasonText, h.status, DATE_FORMAT(h.created_at, '%Y-%m-%d %H:%i:%s') AS createdAt,
               d.name AS doctorName, v.diagnosis
        FROM hospitalization_records h
-       JOIN visit_records v ON h.visit_record_id = v.id
+       JOIN visit_records v ON h.visit_id = v.id
        JOIN doctors d ON v.doctor_id = d.id
        WHERE h.patient_id = ?
        ORDER BY h.created_at DESC`, [req.session.patient.id]
