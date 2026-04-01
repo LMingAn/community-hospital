@@ -11,7 +11,7 @@
         <div class="page-card page-block" style="height:100%;">
           <div class="section-title">待处理患者</div>
           <el-empty v-if="visitableRows.length === 0" description="暂无可处理患者" />
-          <div v-for="item in visitableRows" :key="item.id" class="doctor-card" :class="{ 'visit-selected': selected?.id === item.id }">
+          <div v-for="item in visitableRows" :key="item.id" class="doctor-card visit-card" :class="{ 'visit-selected': selected?.id === item.id }">
             <div class="doctor-card-header">
               <div>
                 <div style="font-weight:700;">{{ item.patientName }} <span class="muted">· {{ item.gender }} · {{ item.age || '-' }}岁</span></div>
@@ -72,42 +72,44 @@ load()
 .visit-layout { display: grid; grid-template-columns: minmax(320px, 420px) minmax(0, 1fr); gap: 18px; align-items: start; }
 .visit-left, .visit-right { min-width: 0; }
 .visit-left .page-card { min-height: 100%; }
-.visit-selected {
-  border-color: #8fb0ea;
-  background: #f8fbff;
-  color: #24324a;
+.visit-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
 }
-.visit-selected .muted,
-.visit-selected .doctor-card-header,
-.visit-selected .doctor-card-header > div,
-.visit-selected .doctor-card-header > div > div,
-.visit-selected .doctor-card-header span:not(.status-tag) {
-  color: inherit;
-}
-.visit-selected .status-tag {
+.visit-card .status-tag {
   white-space: nowrap;
   flex-shrink: 0;
+  line-height: 1.4;
 }
-:global(.dark-mode) .visit-selected {
-  background: rgba(114,163,255,0.12) !important;
+.visit-card.visit-selected {
+  border-color: #8fb0ea !important;
+  background: #f8fbff !important;
+  color: #24324a !important;
+}
+.visit-card.visit-selected .muted,
+.visit-card.visit-selected .doctor-card-header,
+.visit-card.visit-selected .doctor-card-header > div,
+.visit-card.visit-selected .doctor-card-header > div > div,
+.visit-card.visit-selected .doctor-card-header span:not(.status-tag) {
+  color: inherit !important;
+}
+:global(.dark-mode) .visit-card.visit-selected {
+  background: #273245 !important;
   border-color: #5e86d8 !important;
-  color: #e8edf7 !important;
+  color: #eef2fb !important;
 }
-:global(.dark-mode) .visit-selected .muted,
-:global(.dark-mode) .visit-selected .doctor-card-header,
-:global(.dark-mode) .visit-selected .doctor-card-header > div,
-:global(.dark-mode) .visit-selected .doctor-card-header > div > div,
-:global(.dark-mode) .visit-selected .doctor-card-header span:not(.status-tag) {
-  color: #e8edf7 !important;
+:global(.dark-mode) .visit-card.visit-selected .muted,
+:global(.dark-mode) .visit-card.visit-selected .doctor-card-header,
+:global(.dark-mode) .visit-card.visit-selected .doctor-card-header > div,
+:global(.dark-mode) .visit-card.visit-selected .doctor-card-header > div > div,
+:global(.dark-mode) .visit-card.visit-selected .doctor-card-header span:not(.status-tag) {
+  color: #eef2fb !important;
 }
-:global(.dark-mode) .visit-selected .neutral-fixed-button {
+:global(.dark-mode) .visit-card.visit-selected .neutral-fixed-button {
   background: #ffffff !important;
   color: #111827 !important;
   border-color: #2f2f2f !important;
-}
-:global(.dark-mode) .visit-selected .status-tag {
-  white-space: nowrap;
-  flex-shrink: 0;
 }
 @media (max-width: 1100px) {
   .visit-layout { grid-template-columns: 1fr; }
