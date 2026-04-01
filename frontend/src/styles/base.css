@@ -494,3 +494,34 @@ html:not(.dark-mode) .page-card .el-table__body tr.current-row > td.el-table__ce
   background: #edf3ff !important;
   color: var(--text) !important;
 }
+
+.page-header {
+  margin-bottom: 14px;
+}
+.page-extra {
+  margin-bottom: 16px;
+}
+.page-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 0;
+  width: 100%;
+}
+.page-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.page-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+.page-search-input {
+  width: 320px;
+  max-width: 100%;
+}

@@ -1,7 +1,11 @@
 <template>
   <PageContainer title="我的挂号" desc="查看个人所有挂号记录，并支持叫号前在线取消">
     <template #extra>
-      <el-input v-model="keyword" placeholder="搜索挂号单号/医生/科室/状态" clearable style="max-width: 300px" />
+      <div class="page-toolbar">
+        <div class="page-toolbar-left">
+          <el-input v-model="keyword" placeholder="搜索挂号单号/医生/科室/状态" clearable class="page-search-input" />
+        </div>
+      </div>
     </template>
     <el-table :data="filteredList" border>
       <el-table-column label="挂号单号" min-width="180"><template #default="{ row }">{{ row.appointmentNo }}</template></el-table-column>
