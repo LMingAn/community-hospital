@@ -42,7 +42,7 @@ import { ElMessage } from 'element-plus'
 import { authApi, publicApi } from '../../api/modules'
 const router = useRouter(); const departments = ref([]); const form = reactive({ username: '', password: '', name: '', gender: '男', departmentId: '', title: '', specialty: '', phone: '', intro: '' })
 const isDark = ref(localStorage.getItem('hospital-theme') === 'dark')
-function applyTheme() { document.documentElement.classList.toggle('dark-mode', isDark.value); localStorage.setItem('hospital-theme', isDark.value ? 'dark' : 'light') }
+function applyTheme() { document.documentElement.classList.toggle('dark-mode', isDark.value); document.body.classList.toggle('dark-mode', isDark.value); document.body.style.background = isDark.value ? '#151922' : '#f4f6fa'; localStorage.setItem('hospital-theme', isDark.value ? 'dark' : 'light') }
 function toggleTheme() { isDark.value = !isDark.value; applyTheme() }
 onMounted(async () => { applyTheme(); const res = await publicApi.departments(); departments.value = res.data })
 async function submit() { if (!form.username || !form.password || !form.name || !form.departmentId || !form.title || !form.phone) return ElMessage.warning('请先填写必填项'); const res = await authApi.doctorRegister(form); ElMessage.success(res.message || '注册成功'); router.push('/portal') }

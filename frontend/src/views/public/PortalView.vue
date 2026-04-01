@@ -56,6 +56,8 @@ const form = reactive({ role: 'patient', username: '', password: '' })
 
 function applyTheme() {
   document.documentElement.classList.toggle('dark-mode', isDark.value)
+  document.body.classList.toggle('dark-mode', isDark.value)
+  document.body.style.background = isDark.value ? '#151922' : '#f4f6fa'
   localStorage.setItem('hospital-theme', isDark.value ? 'dark' : 'light')
 }
 function toggleTheme() {
