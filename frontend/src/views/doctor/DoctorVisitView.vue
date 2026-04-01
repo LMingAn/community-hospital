@@ -6,8 +6,8 @@
         <el-button type="primary" @click="load">刷新患者列表</el-button>
       </div>
     </div>
-    <el-row :gutter="18">
-      <el-col :lg="10" :md="24" :sm="24">
+    <div class="visit-layout">
+      <section class="visit-left">
         <div class="page-card page-block" style="height:100%;">
           <div class="section-title">待处理患者</div>
           <el-empty v-if="visitableRows.length === 0" description="暂无可处理患者" />
@@ -20,11 +20,11 @@
               <span class="status-tag" :class="statusClass(item.status)">{{ item.status }}</span>
             </div>
             <div class="muted" style="line-height:1.8; margin-bottom:12px;">症状：{{ item.symptom || '无' }}</div>
-            <el-button type="primary" plain @click="selectRow(item)">选择此患者</el-button>
+            <el-button class="neutral-fixed-button" @click="selectRow(item)">选择此患者</el-button>
           </div>
         </div>
-      </el-col>
-      <el-col :lg="14" :md="24" :sm="24">
+      </section>
+      <section class="visit-right">
         <div class="page-card page-block">
           <div class="section-title">病历填写</div>
           <el-alert v-if="!selected" title="请先从左侧选择要处理的患者" type="info" :closable="false" show-icon style="margin-bottom:16px;" />
@@ -48,8 +48,8 @@
             </el-form-item>
           </el-form>
         </div>
-      </el-col>
-    </el-row>
+      </section>
+    </div>
   </PageContainer>
 </template>
 <script setup>
@@ -57,7 +57,7 @@ import { computed, reactive, ref } from 'vue'
 import { doctorApi } from '../../api/modules'
 import PageContainer from '../../components/PageContainer.vue'
 import RichEditor from '../../components/RichEditor.vue'
-import { statusClass, successTip } from '../../utils'
+import { formatDateTime, statusClass, successTip } from '../../utils'
 const date = ref(new Date().toISOString().slice(0, 10))
 const list = ref([])
 const selected = ref(null)
@@ -69,6 +69,12 @@ async function submit() { if (!selected.value) return; await doctorApi.saveVisit
 load()
 </script>
 <style scoped>
+.visit-layout { display: grid; grid-template-columns: minmax(320px, 420px) minmax(0, 1fr); gap: 18px; align-items: start; }
+.visit-left, .visit-right { min-width: 0; }
+.visit-left .page-card { min-height: 100%; }
 .visit-selected { border-color: #8fb0ea; background: #f8fbff; }
 :global(.dark-mode) .visit-selected { background: rgba(114,163,255,0.08); border-color: #5e86d8; }
+@media (max-width: 1100px) {
+  .visit-layout { grid-template-columns: 1fr; }
+}
 </style>
