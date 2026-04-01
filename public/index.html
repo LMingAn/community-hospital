@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>社区医院在线预约管理系统</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="bg-orb orb1"></div>
+  <div class="bg-orb orb2"></div>
+  <header class="hero">
+    <nav class="nav">
+      <div class="logo">健康e约 · 社区医院在线预约管理系统</div>
+      <div class="nav-actions">
+        <button class="ghost-btn" onclick="scrollToSection('bookingSection')">立即预约</button>
+        <button class="ghost-btn" onclick="scrollToSection('adminSection')">后台管理</button>
+      </div>
+    </nav>
+    <div class="hero-grid">
+      <section class="hero-copy card glass">
+        <span class="tag">毕业设计演示版</span>
+        <h1>更智能的社区医院预约流程</h1>
+        <p>集成在线预约、智能分诊建议、热门时段热力提示、预约状态跟踪、后台数据管理于一体，适合毕业设计展示完整业务闭环。</p>
+        <div class="hero-stats">
+          <div><strong id="statTotal">0</strong><span>累计预约</span></div>
+          <div><strong id="statToday">0</strong><span>今日预约</span></div>
+          <div><strong>4</strong><span>核心科室</span></div>
+        </div>
+      </section>
+      <section class="hero-panel card">
+        <h3>系统亮点</h3>
+        <ul class="feature-list">
+          <li>同源部署，前后端接口稳定对齐</li>
+          <li>症状驱动的分诊级别建议</li>
+          <li>可视化时段推荐，支持错峰预约</li>
+          <li>后台统计看板与状态管理</li>
+        </ul>
+      </section>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="section" id="departmentSection">
+      <div class="section-title">
+        <h2>选择科室</h2>
+        <p>从社区常见诊疗场景出发，快速匹配就诊方向。</p>
+      </div>
+      <div id="departmentList" class="department-grid"></div>
+    </section>
+
+    <section class="section booking-layout" id="bookingSection">
+      <div class="booking-left">
+        <div class="card section-card">
+          <div class="section-title compact">
+            <h2>医生与时段</h2>
+            <p>根据科室筛选医生，并查看近7日号源热度。</p>
+          </div>
+          <div id="doctorList" class="doctor-list"></div>
+          <div id="slotBoard" class="slot-board empty">请先选择医生查看可预约时段</div>
+        </div>
+      </div>
+      <div class="booking-right">
+        <div class="card section-card">
+          <div class="section-title compact">
+            <h2>在线预约表单</h2>
+            <p>填写信息后系统将自动生成分诊建议。</p>
+          </div>
+          <form id="bookingForm" class="form-grid">
+            <input name="patientName" placeholder="患者姓名" required />
+            <input name="phone" placeholder="手机号" required />
+            <select name="gender" required>
+              <option value="">性别</option>
+              <option value="男">男</option>
+              <option value="女">女</option>
+            </select>
+            <input name="age" type="number" min="0" placeholder="年龄" required />
+            <select name="departmentId" id="departmentSelect" required></select>
+            <select name="doctorId" id="doctorSelect" required></select>
+            <input name="date" id="dateInput" placeholder="预约日期" required readonly />
+            <input name="time" id="timeInput" placeholder="预约时间" required readonly />
+            <textarea name="symptom" id="symptomInput" placeholder="请描述主要症状，例如：咳嗽、低热、牙痛、失眠复诊等" required></textarea>
+            <button type="button" class="secondary-btn" id="triageBtn">获取分诊建议</button>
+            <button type="submit" class="primary-btn">提交预约</button>
+          </form>
+          <div id="triageBox" class="triage-box hidden"></div>
+          <div id="resultBox" class="result-box hidden"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section query-layout">
+      <div class="card section-card">
+        <div class="section-title compact">
+          <h2>预约查询</h2>
+          <p>输入手机号即可查看预约状态时间线。</p>
+        </div>
+        <div class="query-row">
+          <input id="queryPhone" placeholder="输入手机号查询" />
+          <button class="primary-btn" id="queryBtn">查询记录</button>
+        </div>
+        <div id="appointmentTimeline" class="timeline"></div>
+      </div>
+    </section>
+
+    <section class="section" id="adminSection">
+      <div class="section-title">
+        <h2>后台管理看板</h2>
+        <p>支持管理员登录、预约统计展示、预约状态维护。</p>
+      </div>
+      <div class="admin-grid">
+        <div class="card section-card">
+          <form id="adminLoginForm" class="form-grid admin-form">
+            <input name="username" placeholder="管理员账号" value="admin" required />
+            <input name="password" type="password" placeholder="密码" value="123456" required />
+            <button type="submit" class="primary-btn">管理员登录</button>
+          </form>
+          <div id="adminLoginMsg" class="inline-msg"></div>
+          <div id="dashboard" class="dashboard hidden">
+            <div class="metrics">
+              <div class="metric-card"><span>累计预约</span><strong id="dashTotal">0</strong></div>
+              <div class="metric-card"><span>今日预约</span><strong id="dashToday">0</strong></div>
+              <div class="metric-card"><span>已完成</span><strong id="dashDone">0</strong></div>
+            </div>
+            <div class="bars-wrap">
+              <div>
+                <h4>科室预约分布</h4>
+                <div id="deptBars"></div>
+              </div>
+              <div>
+                <h4>预约状态分布</h4>
+                <div id="statusBars"></div>
+              </div>
+            </div>
+            <div>
+              <h4>预约管理</h4>
+              <table class="data-table">
+                <thead><tr><th>ID</th><th>患者</th><th>科室</th><th>医生</th><th>时间</th><th>状态</th><th>操作</th></tr></thead>
+                <tbody id="adminTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
