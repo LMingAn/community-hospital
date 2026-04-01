@@ -12,6 +12,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { authApi } from '../../api/modules'
 import PageContainer from '../../components/PageContainer.vue'
+import { formatDateTime } from '../../utils'
 const profile = ref({})
 const profileMap = computed(() => ({
   患者账号: profile.value.username,
@@ -21,7 +22,7 @@ const profileMap = computed(() => ({
   手机号: profile.value.phone,
   身份证号: profile.value.idCard,
   账户余额: profile.value.balance,
-  注册时间: profile.value.createdAt
+  注册时间: formatDateTime(profile.value.createdAt)
 }))
 onMounted(async () => { const res = await authApi.patientProfile(); profile.value = res.data || {} })
 </script>

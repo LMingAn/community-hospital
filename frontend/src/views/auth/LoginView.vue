@@ -1,8 +1,4 @@
 <template>
-<<<<<<< HEAD
-  <div class="portal-shell">
-    <div class="portal-card page-card page-block">
-=======
   <div class="portal-shell" :class="{ 'dark-mode': isDark }">
     <div class="portal-card page-card page-block">
       <div class="portal-topbar">
@@ -10,7 +6,6 @@
           <span class="material-symbols-outlined">{{ isDark ? 'light_mode' : 'dark_mode' }}</span>
         </el-button>
       </div>
->>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
       <div class="portal-title-wrap compact">
         <div>
           <h1>用户登录</h1>
@@ -32,11 +27,7 @@
           <div class="portal-actions">
             <el-button type="primary" :loading="loading" @click="submit">登录</el-button>
             <el-button @click="router.push('/portal')">返回首页</el-button>
-<<<<<<< HEAD
-            <el-button v-if="form.role !== 'admin'" plain @click="router.push(`/register/${form.role}`)">去注册</el-button>
-=======
             <el-button v-if="form.role !== 'admin'" class="keep-contrast-button" @click="router.push(`/register/${form.role}`)">去注册</el-button>
->>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
           </div>
         </el-form-item>
       </el-form>
@@ -45,11 +36,7 @@
 </template>
 
 <script setup>
-<<<<<<< HEAD
-import { reactive, watch, ref } from 'vue'
-=======
 import { reactive, watch, ref, onMounted } from 'vue'
->>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { authApi } from '../../api/modules'
@@ -59,10 +46,6 @@ const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const loading = ref(false)
-<<<<<<< HEAD
-const form = reactive({ role: route.params.role || 'patient', username: '', password: '' })
-
-=======
 const isDark = ref(localStorage.getItem('hospital-theme') === 'dark')
 const form = reactive({ role: route.params.role || 'patient', username: '', password: '' })
 
@@ -75,7 +58,6 @@ function toggleTheme() {
   applyTheme()
 }
 
->>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
 watch(() => route.params.role, (value) => { if (value) form.role = value })
 
 function changeRole(value) {
@@ -95,9 +77,6 @@ async function submit() {
     loading.value = false
   }
 }
-<<<<<<< HEAD
-=======
 
 onMounted(applyTheme)
->>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
 </script>

@@ -10,13 +10,10 @@
   --side-bg: #ffffff;
   --danger: #d13f3f;
   --success: #1f8f4d;
-<<<<<<< HEAD
-=======
   --surface-2: #f7f9fd;
   --input-bg: #ffffff;
   --button-neutral-bg: #ffffff;
   --button-neutral-text: #24324a;
->>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
 }
 .dark-mode {
   color-scheme: dark;
@@ -25,22 +22,15 @@
   --primary: #72a3ff;
   --primary-soft: #24334f;
   --line: #313c4f;
-<<<<<<< HEAD
   --text: #eef2fb;
-=======
-  --text: #24324a;
->>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
   --muted: #a8b3c7;
   --side-bg: #1b2230;
   --danger: #f07171;
   --success: #54c98a;
-<<<<<<< HEAD
-=======
   --surface-2: #131a25;
   --input-bg: #131a25;
   --button-neutral-bg: #ffffff;
   --button-neutral-text: #111827;
->>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
 }
 * { box-sizing: border-box; }
 html, body, #app { margin: 0; min-height: 100%; font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif; background: var(--app-bg); color: var(--text); }
@@ -65,21 +55,16 @@ a { color: inherit; text-decoration: none; }
 .auth-cover p { line-height: 1.8; opacity: 0.95; }
 .auth-panel { padding: 24px; background: var(--card-bg); }
 .portal-shell { min-height: 100vh; display: grid; place-items: center; padding: 20px; background: var(--app-bg); }
-<<<<<<< HEAD
-.portal-card { width: min(480px, 100%); }
-=======
 .portal-card { width: min(520px, 100%); }
->>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
 .portal-title-wrap { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
 .portal-title-wrap h1 { margin: 0 0 10px; font-size: 26px; }
 .portal-title-wrap p { margin: 0; color: var(--muted); line-height: 1.8; }
 .portal-title-wrap.compact h1 { font-size: 24px; }
 .portal-icon { font-size: 34px; color: var(--primary); }
 .portal-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-<<<<<<< HEAD
-=======
+.keep-contrast-button { background: #ffffff; color: #111827; border-color: #2f2f2f; }
+.keep-contrast-button:hover { opacity: 0.92; }
 .portal-topbar { display: flex; justify-content: flex-end; margin-bottom: 14px; }
->>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
 .portal-tip { margin-top: 10px; font-size: 13px; line-height: 1.8; }
 .auth-panel .el-input__wrapper,.auth-panel .el-select__wrapper,.el-input__wrapper,.el-select__wrapper,.el-select-dropdown__item,.el-select-dropdown { color: #24324a; }
 .el-select-dropdown__item.is-selected { color: var(--primary); font-weight: 700; }
@@ -100,15 +85,10 @@ a { color: inherit; text-decoration: none; }
 .info-item { border: 1px dashed #ccd8ea; padding: 14px; border-radius: 8px; background: #fcfdff; }
 .dark-mode .info-item { background: rgba(255,255,255,0.02); border-color: #3a465c; }
 .info-item label { display: block; color: var(--muted); margin-bottom: 6px; font-size: 13px; }
-<<<<<<< HEAD
-.rich-editor { border: 1px solid #d0daea; border-radius: 8px; overflow: hidden; }
-.rich-toolbar { padding: 8px; background: #f6f8fc; border-bottom: 1px solid #d0daea; display: flex; gap: 6px; flex-wrap: wrap; }
-.rich-content { min-height: 160px; padding: 14px; outline: none; line-height: 1.8; background: #fff; }
-=======
 .rich-editor { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
 .rich-toolbar { padding: 8px; background: var(--surface-2); border-bottom: 1px solid var(--line); display: flex; gap: 6px; flex-wrap: wrap; }
+.rich-toolbar .el-button { background: var(--button-neutral-bg); color: var(--button-neutral-text); border-color: #2f2f2f; }
 .rich-content { min-height: 160px; padding: 14px; outline: none; line-height: 1.8; background: var(--input-bg); }
->>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
 .doctor-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
 .doctor-card { border: 1px solid var(--line); border-radius: 10px; background: var(--card-bg); padding: 18px; }
 .doctor-card-header { display: flex; justify-content: space-between; gap: 12px; align-items: start; margin-bottom: 12px; }
@@ -122,15 +102,12 @@ a { color: inherit; text-decoration: none; }
 .dark-mode .status-success { background: #1f3a2c; color: #8bd8ac; }
 .dark-mode .status-warning { background: #493c1f; color: #ffd48a; }
 .dark-mode .status-danger { background: #46242c; color: #ff9ba8; }
-<<<<<<< HEAD
-=======
 .dark-mode .el-menu,
 .dark-mode .el-sub-menu__title,
 .dark-mode .el-menu-item { background-color: var(--side-bg) !important; color: var(--text) !important; }
 .dark-mode .el-menu-item.is-active { color: var(--primary) !important; background: rgba(114,163,255,0.12) !important; }
 .dark-mode .el-sub-menu__title:hover,
 .dark-mode .el-menu-item:hover { background: rgba(255,255,255,0.04) !important; }
->>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
 .dark-mode .el-table,
 .dark-mode .el-table tr,
 .dark-mode .el-table th.el-table__cell,
@@ -145,44 +122,29 @@ a { color: inherit; text-decoration: none; }
 .dark-mode .el-alert,
 .dark-mode .el-dialog,
 .dark-mode .el-drawer,
-<<<<<<< HEAD
-.dark-mode .page-card { background-color: var(--card-bg); color: var(--text); border-color: var(--line); }
-=======
 .dark-mode .page-card,
 .dark-mode .el-card__header,
 .dark-mode .el-card__body,
 .dark-mode .el-collapse,
 .dark-mode .el-collapse-item__content { background-color: var(--card-bg); color: var(--text); border-color: var(--line); }
->>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
 .dark-mode .el-input__wrapper,
 .dark-mode .el-select__wrapper,
 .dark-mode .el-textarea__inner,
 .dark-mode .el-input-number,
 .dark-mode .el-input-group__append,
-<<<<<<< HEAD
-.dark-mode .el-input-group__prepend { background-color: #131a25; box-shadow: 0 0 0 1px var(--line) inset; }
-=======
 .dark-mode .el-input-group__prepend,
 .dark-mode .el-input-number__decrease,
 .dark-mode .el-input-number__increase { background-color: var(--input-bg) !important; box-shadow: 0 0 0 1px var(--line) inset; color: var(--text) !important; border-color: var(--line) !important; }
->>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
 .dark-mode .el-input__inner,
 .dark-mode .el-textarea__inner,
 .dark-mode .el-select__placeholder,
 .dark-mode .el-form-item__label,
 .dark-mode .el-radio__label,
 .dark-mode .el-checkbox__label,
-<<<<<<< HEAD
-.dark-mode .el-button,
-=======
->>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
 .dark-mode .el-table,
 .dark-mode .el-table__header-wrapper,
 .dark-mode .el-table__body,
 .dark-mode .el-pagination,
-<<<<<<< HEAD
-.dark-mode .rich-content { color: var(--text); }
-=======
 .dark-mode .rich-content,
 .dark-mode .el-button,
 .dark-mode .el-statistic__content,
@@ -232,7 +194,39 @@ a { color: inherit; text-decoration: none; }
 .dark-mode .el-tabs__item.is-active { color: var(--text) !important; }
 .dark-mode .el-tabs__item.is-active { color: var(--primary) !important; }
 
->>>>>>> b85cd96 (v8（修复部分页面缺失黑白切换按钮，统一前端设计风格，补齐黑暗模式样式，调整用户信息栏区块，导航栏优化）)
+.dark-mode .el-table__body tr:hover > td.el-table__cell,
+.dark-mode .el-table__body tr.current-row > td.el-table__cell,
+.dark-mode .el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell {
+  background: #273245 !important;
+  color: var(--text) !important;
+}
+.dark-mode .el-link,
+.dark-mode .el-link__inner,
+.dark-mode .el-table .cell,
+.dark-mode .el-collapse-item__header,
+.dark-mode .el-collapse-item__header * {
+  color: var(--text) !important;
+}
+.dark-mode .el-input-number__decrease [class*="el-icon"],
+.dark-mode .el-input-number__increase [class*="el-icon"],
+.dark-mode .el-input-number__decrease svg,
+.dark-mode .el-input-number__increase svg,
+.dark-mode .el-button [class*="el-icon"],
+.dark-mode .el-button .material-symbols-outlined {
+  color: inherit !important;
+}
+.dark-mode .rich-toolbar .el-button,
+.dark-mode .portal-actions .keep-contrast-button,
+.dark-mode .el-button.keep-contrast-button {
+  background: #ffffff !important;
+  color: #111827 !important;
+  border-color: #2f2f2f !important;
+}
+.dark-mode .el-button.is-text:hover,
+.dark-mode .el-link:hover {
+  color: var(--primary) !important;
+}
+
 @media (max-width: 960px) {
   .auth-card,.layout-shell { grid-template-columns: 1fr; }
   .layout-side { border-right: 0; border-bottom: 1px solid var(--line); }

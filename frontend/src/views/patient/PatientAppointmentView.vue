@@ -15,7 +15,7 @@
         <div class="doctor-card-header">
           <div>
             <div style="font-size:18px;font-weight:700;">{{ item.doctorName }} <span class="muted">· {{ item.title }}</span></div>
-            <div class="muted" style="margin-top:6px;">{{ item.departmentName }} ｜ {{ item.period }} ｜ {{ item.visitDate }}</div>
+            <div class="muted" style="margin-top:6px;">{{ item.departmentName }} ｜ {{ item.period }} ｜ {{ formatDateTime(item.visitDate) }}</div>
           </div>
           <span class="status-tag" :class="statusClass(getDoctorHeat(item))">{{ getDoctorHeat(item) }}</span>
         </div>
@@ -37,7 +37,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { patientApi, publicApi } from '../../api/modules'
 import PageContainer from '../../components/PageContainer.vue'
-import { getDoctorHeat, statusClass, successTip } from '../../utils'
+import { formatDateTime, getDoctorHeat, statusClass, successTip } from '../../utils'
 const date = ref(new Date().toISOString().slice(0, 10))
 const departmentId = ref('')
 const doctors = ref([])
