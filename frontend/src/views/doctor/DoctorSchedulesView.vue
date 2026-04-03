@@ -19,5 +19,8 @@ import { doctorApi } from '../../api/modules'
 import PageContainer from '../../components/PageContainer.vue'
 import { weekdayLabel } from '../../utils'
 const list = ref([])
-onMounted(async () => { const res = await doctorApi.schedules(); list.value = res.data || [] })
+onMounted(async () => { 
+  const res = await doctorApi.schedules(); 
+  list.value = res.data || [] 
+})
 </script>

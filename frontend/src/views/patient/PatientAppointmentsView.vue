@@ -38,7 +38,15 @@ const filteredList = computed(() => {
   if (!q) return list.value
   return list.value.filter((row) => `${row.appointmentNo || ''}${row.doctorName || ''}${row.departmentName || ''}${row.status || ''}${formatDateTime(row.visitDate)}`.includes(q))
 })
-async function load() { const res = await patientApi.appointments(); list.value = res.data || [] }
-async function cancel(row) { await confirmAction(`确认取消 ${formatDateTime(row.visitDate)} ${row.period} 的挂号吗？`); await patientApi.cancelAppointment(row.id); successTip('挂号已取消'); load() }
+async function load() { 
+  const res = await patientApi.appointments(); 
+  list.value = res.data || [] 
+}
+async function cancel(row) { 
+  await confirmAction(`确认取消 ${formatDateTime(row.visitDate)} ${row.period} 的挂号吗？`); 
+  await patientApi.cancelAppointment(row.id); 
+  successTip('挂号已取消'); 
+  load() 
+}
 onMounted(load)
 </script>

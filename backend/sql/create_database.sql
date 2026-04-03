@@ -53,7 +53,6 @@ create table patients (
   age int default null comment '年龄',
   phone varchar(11) not null unique comment '手机号',
   identity_card_no char(18) default '' comment '身份证号',
-  balance decimal(10,2) not null default 0.00 comment '账户余额',
   status tinyint not null default 1 comment '状态：1正常，0停用',
   created_at datetime not null default current_timestamp comment '创建时间'
 ) comment='患者信息表';
@@ -116,15 +115,6 @@ create table hospitalization_records (
   constraint fk_hospital_patient foreign key (patient_id) references patients(id),
   constraint fk_hospital_visit foreign key (visit_id) references visit_records(id)
 ) comment='住院登记表';
-
-create table recharge_records (
-  id int primary key auto_increment comment '充值记录主键',
-  patient_id int not null comment '患者id',
-  amount decimal(10,2) not null comment '充值金额',
-  created_at datetime not null default current_timestamp comment '充值时间',
-  remark varchar(10) default '线上充值' comment '备注',
-  constraint fk_recharge_patient foreign key (patient_id) references patients(id)
-) comment='患者充值记录表';
 
 create table appointment_logs (
   id int primary key auto_increment comment '挂号日志主键',

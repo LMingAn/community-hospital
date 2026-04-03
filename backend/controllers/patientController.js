@@ -146,21 +146,3 @@ exports.myHospitalizations = async (req, res, next) => {
     res.json({ success: true, data: rows });
   } catch (error) { next(error); }
 };
-
-exports.recharge = async (req, res, next) => {
-  const conn = await pool.getConnection();
-  try {
-    const amount = Number(req.body.amount || 0);
-    if (!(amount > 0)) return res.status(400).json({ success: false, message: '请输入有效充值金额' });
-    await conn.beginTransaction();
-    await conn.query('UPDATE patients SET balance = balance + ? WHERE id = ?', [amount, req.session.patient.id]);
-    await conn.query('INSERT INTO recharge_records (patient_id, amount, remark) VALUES (?, ?, ?)', [req.session.patient.id, amount, '患者自助充值']);
-    await conn.commit();
-    res.json({ success: true, message: '充值成功' });
-  } catch (error) {
-    await conn.rollback();
-    next(error);
-  } finally {
-    conn.release();
-  }
-};

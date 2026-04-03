@@ -9,6 +9,5 @@ router.patch('/appointments/:id/cancel', requirePatient, patientController.cance
 router.get('/appointments', requirePatient, patientController.myAppointments);
 router.get('/visits', requirePatient, patientController.myVisits);
 router.get('/hospitalizations', requirePatient, patientController.myHospitalizations);
-router.post('/recharge', requirePatient, patientController.recharge);
 
 module.exports = router;

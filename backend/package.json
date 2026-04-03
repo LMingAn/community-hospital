@@ -1,7 +1,7 @@
 {
   "name": "community-hospital-appointment-system",
   "version": "2.0.0",
-  "description": "本科毕业设计：社区医院在线预约管理系统（Node.js + Express + MySQL 8.0）",
+  "description": "本科毕业设计：社区医院在线预约管理系统（Node.js + Express + MySQL）",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

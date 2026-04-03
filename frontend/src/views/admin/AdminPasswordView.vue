@@ -34,7 +34,23 @@ const activeName = ref('change')
 const demoCode = ref('')
 const changeForm = reactive({ oldPassword: '', newPassword: '' })
 const resetForm = reactive({ phone: '', code: '', newPassword: '' })
-async function submitChange() { await adminApi.password(changeForm); successTip('密码修改成功'); changeForm.oldPassword=''; changeForm.newPassword='' }
-async function getCode() { const res = await authApi.adminResetCode({ phone: resetForm.phone }); demoCode.value = res.data?.code || ''; successTip('验证码已生成') }
-async function submitReset() { await authApi.adminResetPassword(resetForm); successTip('密码重置成功'); resetForm.phone=''; resetForm.code=''; resetForm.newPassword=''; demoCode.value='' }
+async function submitChange() { 
+  await adminApi.password(changeForm); 
+  successTip('密码修改成功'); 
+  changeForm.oldPassword=''; 
+  changeForm.newPassword='' 
+}
+async function getCode() { 
+  const res = await authApi.adminResetCode({ phone: resetForm.phone }); 
+  demoCode.value = res.data?.code || ''; 
+  successTip('验证码已生成') 
+}
+async function submitReset() { 
+  await authApi.adminResetPassword(resetForm); 
+  successTip('密码重置成功'); 
+  resetForm.phone=''; 
+  resetForm.code=''; 
+  resetForm.newPassword=''; 
+  demoCode.value='' 
+}
 </script>

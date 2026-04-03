@@ -51,8 +51,8 @@ exports.patientRegister = async (req, res, next) => {
     const exists = await findOne('SELECT id FROM patients WHERE username = ? OR phone = ? LIMIT 1', [username, phone]);
     if (exists) return res.status(400).json({ success: false, message: '用户名或手机号已存在' });
     await pool.query(
-      `INSERT INTO patients (username, password_hash, name, gender, age, phone, identity_card_no, balance)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 0)`,
+      `INSERT INTO patients (username, password_hash, name, gender, age, phone, identity_card_no)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [username, hashPassword(password), name, gender || '男', age || null, phone, idCard || '']
     );
     res.json({ success: true, message: '患者注册成功，请登录' });
@@ -63,13 +63,13 @@ exports.patientLogin = async (req, res, next) => {
   try {
     const { username, password } = req.body;
     const patient = await findOne(
-      'SELECT id, username, name, phone, balance, password_hash AS passwordHash FROM patients WHERE username = ? LIMIT 1',
+      'SELECT id, username, name, phone, password_hash AS passwordHash FROM patients WHERE username = ? LIMIT 1',
       [username]
     );
     if (!patient || patient.passwordHash !== hashPassword(password)) {
       return res.status(401).json({ success: false, message: '患者账号或密码错误' });
     }
-    req.session.patient = { id: patient.id, username: patient.username, name: patient.name, phone: patient.phone, balance: Number(patient.balance) };
+    req.session.patient = { id: patient.id, username: patient.username, name: patient.name, phone: patient.phone };
     res.json({ success: true, message: '患者登录成功', data: req.session.patient });
   } catch (error) { next(error); }
 };
@@ -82,7 +82,7 @@ exports.patientLogout = (req, res) => {
 exports.patientProfile = async (req, res, next) => {
   try {
     const patient = await findOne(
-      `SELECT id, username, name, gender, age, phone, identity_card_no AS idCard, balance,
+      `SELECT id, username, name, gender, age, phone, identity_card_no AS idCard,
               DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt
        FROM patients WHERE id = ?`,
       [req.session.patient.id]
@@ -115,8 +115,18 @@ exports.patientChangePassword = async (req, res, next) => {
     res.json({ success: true, message: '患者密码修改成功' });
   } catch (error) { next(error); }
 };
-exports.patientResetCode = async (req, res, next) => { try { await sendResetCode(req, res, 'patient', 'patients'); } catch (error) { next(error); } };
-exports.patientResetPassword = async (req, res, next) => { try { await resetPasswordByCode(req, res, 'patient', 'patients'); } catch (error) { next(error); } };
+
+exports.patientResetCode = async (req, res, next) => { 
+  try { 
+    await sendResetCode(req, res, 'patient', 'patients'); 
+  } catch (error) { next(error); } 
+};
+
+exports.patientResetPassword = async (req, res, next) => { 
+  try { 
+    await resetPasswordByCode(req, res, 'patient', 'patients'); 
+  } catch (error) { next(error); } 
+};
 
 exports.doctorRegister = async (req, res, next) => {
   try {
@@ -197,7 +207,9 @@ exports.doctorChangePassword = async (req, res, next) => {
     res.json({ success: true, message: '医生密码修改成功' });
   } catch (error) { next(error); }
 };
+
 exports.doctorResetCode = async (req, res, next) => { try { await sendResetCode(req, res, 'doctor', 'doctors'); } catch (error) { next(error); } };
+
 exports.doctorResetPassword = async (req, res, next) => { try { await resetPasswordByCode(req, res, 'doctor', 'doctors'); } catch (error) { next(error); } };
 
 exports.adminLogin = async (req, res, next) => {

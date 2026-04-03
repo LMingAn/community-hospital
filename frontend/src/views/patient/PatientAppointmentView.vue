@@ -47,7 +47,10 @@ const filteredDoctors = computed(() => {
   if (!departmentId.value) return doctors.value
   return doctors.value.filter(item => String(item.departmentId) === String(departmentId.value))
 })
-async function loadDoctors() { const res = await patientApi.todayDoctors({ date: date.value }); doctors.value = res.data || [] }
+async function loadDoctors() { 
+  const res = await patientApi.todayDoctors({ date: date.value }); 
+  doctors.value = res.data || [] 
+}
 async function submitAppointment(item) {
   await patientApi.createAppointment({ doctorId: item.doctorId, departmentId: item.departmentId, visitDate: item.visitDate, period: item.period, symptom: symptomMap.value[item.scheduleId] || '' })
   successTip('挂号成功')

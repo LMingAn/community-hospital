@@ -40,7 +40,15 @@ const filteredList = computed(() => {
   if (!q) return list.value
   return list.value.filter((row) => `${row.appointmentNo || ''}${row.patientName || ''}${row.status || ''}${row.symptom || ''}${formatDateTime(row.visitDate)}`.includes(q))
 })
-async function load() { const res = await doctorApi.appointments({ date: date.value }); list.value = res.data || [] }
-async function callPatient(row) { await confirmAction(`确认叫号患者 ${row.patientName} 吗？`); await doctorApi.callPatient(row.id); successTip('叫号成功'); load() }
+async function load() { 
+  const res = await doctorApi.appointments({ date: date.value }); 
+  list.value = res.data || [] 
+}
+async function callPatient(row) { 
+  await confirmAction(`确认叫号患者 ${row.patientName} 吗？`); 
+  await doctorApi.callPatient(row.id); 
+  successTip('叫号成功'); 
+  load() 
+}
 load()
 </script>

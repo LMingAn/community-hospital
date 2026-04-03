@@ -1,5 +1,11 @@
 import http from './http'
-export const publicApi = { health: () => http.get('/health'), announcements: () => http.get('/api/announcements'), departments: () => http.get('/api/departments'), todayDoctors: (params) => http.get('/api/today-doctors', { params }), triage: (data) => http.post('/api/triage', data) }
+export const publicApi = { 
+  health: () => http.get('/health'), 
+  announcements: () => http.get('/api/announcements'), 
+  departments: () => http.get('/api/departments'), 
+  todayDoctors: (params) => http.get('/api/today-doctors', { params }), 
+  triage: (data) => http.post('/api/triage', data) 
+}
 export const authApi = {
   patientRegister: (data) => http.post('/api/auth/patient/register', data),
   patientLogin: (data) => http.post('/api/auth/patient/login', data),
@@ -34,5 +40,18 @@ export const adminApi = {
   visits: () => http.get('/api/admin/visits'), createVisit: (data) => http.post('/api/admin/visits', data), updateVisit: (id, data) => http.put(`/api/admin/visits/${id}`, data), deleteVisit: (id) => http.delete(`/api/admin/visits/${id}`),
   hospitalizations: () => http.get('/api/admin/hospitalizations'), createHospitalization: (data) => http.post('/api/admin/hospitalizations', data), updateHospitalization: (id, data) => http.put(`/api/admin/hospitalizations/${id}`, data), deleteHospitalization: (id) => http.delete(`/api/admin/hospitalizations/${id}`)
 }
-export const doctorApi = { announcements: () => http.get('/api/doctor/announcements'), schedules: (params) => http.get('/api/doctor/schedules', { params }), appointments: (params) => http.get('/api/doctor/appointments', { params }), callPatient: (id) => http.patch(`/api/doctor/appointments/${id}/call`), saveVisit: (data) => http.post('/api/doctor/visits', data) }
-export const patientApi = { todayDoctors: (params) => http.get('/api/patient/today-doctors', { params }), createAppointment: (data) => http.post('/api/patient/appointments', data), cancelAppointment: (id) => http.patch(`/api/patient/appointments/${id}/cancel`), appointments: () => http.get('/api/patient/appointments'), visits: () => http.get('/api/patient/visits'), hospitalizations: () => http.get('/api/patient/hospitalizations'), recharge: (data) => http.post('/api/patient/recharge', data) }
+export const doctorApi = { 
+  announcements: () => http.get('/api/doctor/announcements'), 
+  schedules: (params) => http.get('/api/doctor/schedules', { params }), 
+  appointments: (params) => http.get('/api/doctor/appointments', { params }), 
+  callPatient: (id) => http.patch(`/api/doctor/appointments/${id}/call`), 
+  saveVisit: (data) => http.post('/api/doctor/visits', data) 
+}
+export const patientApi = { 
+  todayDoctors: (params) => http.get('/api/patient/today-doctors', { params }), 
+  createAppointment: (data) => http.post('/api/patient/appointments', data), 
+  cancelAppointment: (id) => http.patch(`/api/patient/appointments/${id}/cancel`), 
+  appointments: () => http.get('/api/patient/appointments'), 
+  visits: () => http.get('/api/patient/visits'), 
+  hospitalizations: () => http.get('/api/patient/hospitalizations'), 
+}

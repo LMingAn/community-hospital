@@ -69,8 +69,15 @@ async function submit() {
   if (!form.role || !form.username || !form.password) return ElMessage.warning('请完整填写登录信息')
   loading.value = true
   try {
-    const apiMap = { admin: authApi.adminLogin, doctor: authApi.doctorLogin, patient: authApi.patientLogin }
-    const res = await apiMap[form.role]({ username: form.username, password: form.password })
+    const apiMap = { 
+      admin: authApi.adminLogin, 
+      doctor: authApi.doctorLogin, 
+      patient: authApi.patientLogin 
+    }
+    const res = await apiMap[form.role]({ 
+      username: form.username, 
+      password: form.password 
+    })
     auth.setAuth(form.role, res.data)
     ElMessage.success(res.message || '登录成功')
     router.push(`/${form.role}`)

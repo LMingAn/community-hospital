@@ -16,9 +16,16 @@
       <el-table-column prop="doctorName" label="医生" width="110" />
       <el-table-column prop="diagnosis" label="诊断结果" min-width="180" />
       <el-table-column prop="prescription" label="处方信息" min-width="180" show-overflow-tooltip />
-      <el-table-column label="是否住院" width="100"><template #default="{ row }"><span class="status-tag" :class="row.needHospitalization ? 'status-warning' : 'status-success'">{{ row.needHospitalization ? '是' : '否' }}</span></template></el-table-column>
+      <el-table-column label="是否住院" width="100">
+        <template #default="{ row }"><span class="status-tag" :class="row.needHospitalization ? 'status-warning' : 'status-success'">{{ row.needHospitalization ? '是' : '否' }}</span></template>
+      </el-table-column>
       <el-table-column prop="createdAt" label="就诊时间" min-width="180" />
-      <el-table-column label="操作" width="180"><template #default="{ row }"><el-button link type="primary" @click="openEdit(row)">编辑</el-button><el-button link type="danger" @click="remove(row)">删除</el-button></template></el-table-column>
+      <el-table-column label="操作" width="180">
+        <template #default="{ row }">
+          <el-button link type="primary" @click="openEdit(row)">编辑</el-button>
+          <el-button link type="danger" @click="remove(row)">删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <el-dialog v-model="visible" :title="form.id ? '编辑就诊记录' : '新增就诊记录'" width="720px">
       <el-form :model="form" label-width="88px">
@@ -49,11 +56,27 @@ const filteredList = computed(() => {
 })
 const form = reactive({ id:'', appointmentId:'', patientId:'', doctorId:'', diagnosis:'', adviceHtml:'', prescription:'', needHospitalization:false })
 const reset = () => Object.assign(form, { id:'', appointmentId:'', patientId:'', doctorId:'', diagnosis:'', adviceHtml:'', prescription:'', needHospitalization:false })
-async function load(){ const [visitRes, appointmentRes, patientRes, doctorRes] = await Promise.all([adminApi.visits(), adminApi.appointments(), adminApi.patients(), adminApi.doctors()]); list.value = visitRes.data || []; appointments.value = appointmentRes.data || []; patients.value = patientRes.data || []; doctors.value = doctorRes.data || [] }
+async function load(){ 
+  const [visitRes, appointmentRes, patientRes, doctorRes] = await Promise.all([adminApi.visits(), adminApi.appointments(), adminApi.patients(), adminApi.doctors()]); 
+  list.value = visitRes.data || []; appointments.value = appointmentRes.data || []; patients.value = patientRes.data || []; doctors.value = doctorRes.data || [] 
+}
 function syncAppointment(id){ const row = appointments.value.find(item => item.id === id); if(row){ form.patientId = row.patientId; form.doctorId = row.doctorId } }
 function openCreate(){ reset(); visible.value = true }
 function openEdit(row){ Object.assign(form, row, { needHospitalization: !!row.needHospitalization }); visible.value = true }
-async function submit(){ if(form.id) await adminApi.updateVisit(form.id, form); else await adminApi.createVisit(form); successTip('保存成功'); visible.value = false; load() }
-async function remove(row){ await confirmAction(`确认删除挂号单 ${row.appointmentNo} 的就诊记录吗？`); await adminApi.deleteVisit(row.id); successTip('删除成功'); load() }
+async function submit(){ 
+  if(form.id) 
+    await adminApi.updateVisit(form.id, form); 
+  else 
+    await adminApi.createVisit(form); 
+  successTip('保存成功'); 
+  visible.value = false; 
+  load() 
+}
+async function remove(row){ 
+  await confirmAction(`确认删除挂号单 ${row.appointmentNo} 的就诊记录吗？`); 
+  await adminApi.deleteVisit(row.id); 
+  successTip('删除成功'); 
+  load() 
+}
 onMounted(load)
 </script>

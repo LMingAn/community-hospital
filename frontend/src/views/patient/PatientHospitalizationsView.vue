@@ -30,5 +30,8 @@ const filteredList = computed(() => {
   if (!q) return list.value
   return list.value.filter((row) => `${row.doctorName || ''}${row.diagnosis || ''}${row.wardNo || ''}${row.bedNo || ''}${row.reasonText || ''}${row.status || ''}${formatDateTime(row.createdAt)}`.includes(q))
 })
-onMounted(async () => { const res = await patientApi.hospitalizations(); list.value = res.data || [] })
+onMounted(async () => { 
+  const res = await patientApi.hospitalizations(); 
+  list.value = res.data || [] 
+})
 </script>

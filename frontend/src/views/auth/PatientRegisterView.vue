@@ -41,8 +41,19 @@ import { authApi } from '../../api/modules'
 const router = useRouter()
 const isDark = ref(localStorage.getItem('hospital-theme') === 'dark')
 const form = reactive({ username: '', password: '', name: '', gender: '男', age: 25, phone: '', idCard: '' })
-function applyTheme() { document.documentElement.classList.toggle('dark-mode', isDark.value); document.body.classList.toggle('dark-mode', isDark.value); document.body.style.background = isDark.value ? '#151922' : '#f4f6fa'; localStorage.setItem('hospital-theme', isDark.value ? 'dark' : 'light') }
+function applyTheme() { 
+  document.documentElement.classList.toggle('dark-mode', isDark.value); 
+  document.body.classList.toggle('dark-mode', isDark.value); 
+  document.body.style.background = isDark.value ? '#151922' : '#f4f6fa'; 
+  localStorage.setItem('hospital-theme', isDark.value ? 'dark' : 'light') 
+}
 function toggleTheme() { isDark.value = !isDark.value; applyTheme() }
-async function submit() { if (!form.username || !form.password || !form.name || !form.phone) return ElMessage.warning('请先填写必填项'); const res = await authApi.patientRegister(form); ElMessage.success(res.message || '注册成功'); router.push('/portal') }
+async function submit() { 
+  if (!form.username || !form.password || !form.name || !form.phone) 
+    return ElMessage.warning('请先填写必填项'); 
+  const res = await authApi.patientRegister(form); 
+  ElMessage.success(res.message || '注册成功'); 
+  router.push('/portal') 
+}
 onMounted(applyTheme)
 </script>

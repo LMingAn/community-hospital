@@ -47,10 +47,26 @@ const filteredList = computed(() => {
 })
 const form = reactive({ id:'', patientId:'', visitRecordId:'', wardNo:'', bedNo:'', reasonText:'', status:'待入院' })
 const reset = () => Object.assign(form, { id:'', patientId:'', visitRecordId:'', wardNo:'', bedNo:'', reasonText:'', status:'待入院' })
-async function load(){ const [hRes,pRes,vRes] = await Promise.all([adminApi.hospitalizations(), adminApi.patients(), adminApi.visits()]); list.value = hRes.data || []; patients.value = pRes.data || []; visits.value = vRes.data || [] }
+async function load(){ 
+  const [hRes,pRes,vRes] = await Promise.all([adminApi.hospitalizations(), adminApi.patients(), adminApi.visits()]); 
+  list.value = hRes.data || []; patients.value = pRes.data || []; visits.value = vRes.data || [] 
+}
 function openCreate(){ reset(); visible.value = true }
 function openEdit(row){ Object.assign(form, row); visible.value = true }
-async function submit(){ if(form.id) await adminApi.updateHospitalization(form.id, form); else await adminApi.createHospitalization(form); successTip('保存成功'); visible.value = false; load() }
-async function remove(row){ await confirmAction(`确认删除 ${row.patientName} 的住院登记吗？`); await adminApi.deleteHospitalization(row.id); successTip('删除成功'); load() }
+async function submit(){ 
+  if(form.id) 
+    await adminApi.updateHospitalization(form.id, form); 
+  else 
+    await adminApi.createHospitalization(form); 
+  successTip('保存成功'); 
+  visible.value = false; 
+  load() 
+}
+async function remove(row){ 
+  await confirmAction(`确认删除 ${row.patientName} 的住院登记吗？`); 
+  await adminApi.deleteHospitalization(row.id); 
+  successTip('删除成功'); 
+  load() 
+}
 onMounted(load)
 </script>

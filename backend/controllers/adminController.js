@@ -36,7 +36,13 @@ exports.stats = async (req, res, next) => {
   } catch (error) { next(error); }
 };
 
-exports.listDepartments = async (req, res, next) => { try { const [rows] = await pool.query('SELECT id, name, description, location, status FROM departments ORDER BY id'); res.json({ success: true, data: rows }); } catch (error) { next(error); } };
+exports.listDepartments = async (req, res, next) => { 
+  try { 
+    const [rows] = await pool.query('SELECT id, name, description, location, status FROM departments ORDER BY id'); 
+    res.json({ success: true, data: rows }); 
+  } catch (error) { next(error); } 
+};
+
 exports.createDepartment = async (req, res, next) => {
   try {
     const { name, description, location, status } = req.body;
@@ -78,36 +84,141 @@ exports.updateDoctor = async (req, res, next) => {
     res.json({ success: true, message: '医生更新成功' });
   } catch (error) { next(error); }
 };
-exports.deleteDoctor = async (req, res, next) => { try { await pool.query('DELETE FROM doctors WHERE id = ?', [req.params.id]); res.json({ success: true, message: '医生删除成功' }); } catch (error) { next(error); } };
+exports.deleteDoctor = async (req, res, next) => {
+  const conn = await pool.getConnection();
+  try {
+    const doctorId = Number(req.params.id);
+
+    const [[doctor]] = await conn.query(
+      'select id, name from doctors where id = ? limit 1',
+      [doctorId]
+    );
+    if (!doctor) {
+      return res.status(404).json({ success: false, message: '医生不存在' });
+    }
+
+    const [[scheduleRef]] = await conn.query(
+      'select id from weekly_schedules where doctor_id = ? limit 1',
+      [doctorId]
+    );
+    const [[appointmentRef]] = await conn.query(
+      'select id from appointments where doctor_id = ? limit 1',
+      [doctorId]
+    );
+    const [[visitRef]] = await conn.query(
+      'select id from visit_records where doctor_id = ? limit 1',
+      [doctorId]
+    );
+
+    if (scheduleRef || appointmentRef || visitRef) {
+      return res.status(400).json({
+        success: false,
+        message: '该医生已关联排班、挂号或就诊记录，不能直接删除，请先清理关联数据'
+      });
+    }
+
+    await conn.query('delete from doctors where id = ?', [doctorId]);
+    res.json({ success: true, message: '医生删除成功' });
+  } catch (error) {
+    next(error);
+  } finally {
+    conn.release();
+  }
+};
 
 exports.listPatients = async (req, res, next) => {
   try {
-    const [rows] = await pool.query(`SELECT id, username, name, gender, age, phone, identity_card_no AS idCard, balance, status, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt FROM patients ORDER BY id DESC`);
+    const [rows] = await pool.query(`SELECT id, username, name, gender, age, phone, identity_card_no AS idCard, status, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS createdAt FROM patients ORDER BY id DESC`);
     res.json({ success: true, data: rows });
   } catch (error) { next(error); }
 };
 exports.createPatient = async (req, res, next) => {
   try {
-    const { username, password, name, gender, age, phone, idCard, balance, status } = req.body;
+    const { username, password, name, gender, age, phone, idCard, status } = req.body;
     if (!username || !password || !name || !phone) return res.status(400).json({ success: false, message: '请完整填写患者信息' });
-    await pool.query(`INSERT INTO patients (username, password_hash, name, gender, age, phone, identity_card_no, balance, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, [username, hashPassword(password), name, gender || '男', age || null, phone, idCard || '', balance || 0, status ?? 1]);
+    await pool.query(`INSERT INTO patients (username, password_hash, name, gender, age, phone, identity_card_no, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [username, hashPassword(password), name, gender || '男', age || null, phone, idCard || '', status ?? 1]);
     res.json({ success: true, message: '患者新增成功' });
   } catch (error) { next(error); }
 };
 exports.updatePatient = async (req, res, next) => {
   try {
-    const { username, name, gender, age, phone, idCard, balance, status, password } = req.body;
-    await pool.query(`UPDATE patients SET username = ?, name = ?, gender = ?, age = ?, phone = ?, identity_card_no = ?, balance = ?, status = ? WHERE id = ?`, [username, name, gender || '男', age || null, phone, idCard || '', balance || 0, status ?? 1, req.params.id]);
+    const { username, name, gender, age, phone, idCard, status, password } = req.body;
+    await pool.query(`UPDATE patients SET username = ?, name = ?, gender = ?, age = ?, phone = ?, identity_card_no = ?, status = ? WHERE id = ?`, [username, name, gender || '男', age || null, phone, idCard || '', status ?? 1, req.params.id]);
     if (password) await pool.query('UPDATE patients SET password_hash = ? WHERE id = ?', [hashPassword(password), req.params.id]);
     res.json({ success: true, message: '患者更新成功' });
   } catch (error) { next(error); }
 };
-exports.deletePatient = async (req, res, next) => { try { await pool.query('DELETE FROM patients WHERE id = ?', [req.params.id]); res.json({ success: true, message: '患者删除成功' }); } catch (error) { next(error); } };
+exports.deletePatient = async (req, res, next) => {
+  const conn = await pool.getConnection();
+  try {
+    const patientId = Number(req.params.id);
 
-exports.listAnnouncements = async (req, res, next) => { try { const [rows] = await pool.query(`SELECT id, title, content, DATE_FORMAT(published_at, '%Y-%m-%d %H:%i:%s') AS publishTime, status FROM announcements ORDER BY published_at DESC`); res.json({ success: true, data: rows }); } catch (error) { next(error); } };
-exports.createAnnouncement = async (req, res, next) => { try { const { title, content, status } = req.body; if (!title || !content) return res.status(400).json({ success: false, message: '请输入公告标题和内容' }); await pool.query('INSERT INTO announcements (title, content, status) VALUES (?, ?, ?)', [title, content, status ?? 1]); res.json({ success: true, message: '公告发布成功' }); } catch (error) { next(error); } };
-exports.updateAnnouncement = async (req, res, next) => { try { const { title, content, status } = req.body; await pool.query('UPDATE announcements SET title = ?, content = ?, status = ? WHERE id = ?', [title, content, status ?? 1, req.params.id]); res.json({ success: true, message: '公告更新成功' }); } catch (error) { next(error); } };
-exports.deleteAnnouncement = async (req, res, next) => { try { await pool.query('DELETE FROM announcements WHERE id = ?', [req.params.id]); res.json({ success: true, message: '公告删除成功' }); } catch (error) { next(error); } };
+    const [[patient]] = await conn.query(
+      'select id, name from patients where id = ? limit 1',
+      [patientId]
+    );
+    if (!patient) {
+      return res.status(404).json({ success: false, message: '患者不存在' });
+    }
+
+    const [[appointmentRef]] = await conn.query(
+      'select id from appointments where patient_id = ? limit 1',
+      [patientId]
+    );
+    const [[visitRef]] = await conn.query(
+      'select id from visit_records where patient_id = ? limit 1',
+      [patientId]
+    );
+    const [[hospitalRef]] = await conn.query(
+      'select id from hospitalization_records where patient_id = ? limit 1',
+      [patientId]
+    );
+
+    if (appointmentRef || visitRef || hospitalRef) {
+      return res.status(400).json({
+        success: false,
+        message: '该患者已关联挂号、就诊或住院记录，不能直接删除，请先清理关联数据'
+      });
+    }
+
+    await conn.query('delete from patients where id = ?', [patientId]);
+    res.json({ success: true, message: '患者删除成功' });
+  } catch (error) {
+    next(error);
+  } finally {
+    conn.release();
+  }
+};
+
+exports.listAnnouncements = async (req, res, next) => { 
+  try { 
+    const [rows] = await pool.query(`SELECT id, title, content, DATE_FORMAT(published_at, '%Y-%m-%d %H:%i:%s') AS publishTime, status FROM announcements ORDER BY published_at DESC`); 
+    res.json({ success: true, data: rows }); 
+  } catch (error) { next(error); } 
+};
+
+exports.createAnnouncement = async (req, res, next) => { 
+  try { 
+    const { title, content, status } = req.body; 
+    if (!title || !content) return res.status(400).json({ success: false, message: '请输入公告标题和内容' }); 
+    await pool.query('INSERT INTO announcements (title, content, status) VALUES (?, ?, ?)', [title, content, status ?? 1]); 
+    res.json({ success: true, message: '公告发布成功' }); 
+  } catch (error) { next(error); } 
+};
+
+exports.updateAnnouncement = async (req, res, next) => { 
+  try { 
+    const { title, content, status } = req.body; 
+    await pool.query('UPDATE announcements SET title = ?, content = ?, status = ? WHERE id = ?', [title, content, status ?? 1, req.params.id]); 
+    res.json({ success: true, message: '公告更新成功' }); 
+  } catch (error) { next(error); } 
+};
+exports.deleteAnnouncement = async (req, res, next) => { 
+  try { 
+    await pool.query('DELETE FROM announcements WHERE id = ?', [req.params.id]); 
+    res.json({ success: true, message: '公告删除成功' }); 
+  } catch (error) { next(error); } 
+};
 
 exports.listSchedules = async (req, res, next) => {
   try {
@@ -115,9 +226,27 @@ exports.listSchedules = async (req, res, next) => {
     res.json({ success: true, data: rows });
   } catch (error) { next(error); }
 };
-exports.createSchedule = async (req, res, next) => { try { const { doctorId, weekday, period, maxNumber, fee, status } = req.body; if (!doctorId || !weekday || !period) return res.status(400).json({ success: false, message: '请完整填写排班信息' }); await pool.query(`INSERT INTO weekly_schedules (doctor_id, weekday, period, max_slots, fee, status) VALUES (?, ?, ?, ?, ?, ?)`, [doctorId, weekday, period, maxNumber || 20, fee || 15, status ?? 1]); res.json({ success: true, message: '排班新增成功' }); } catch (error) { next(error); } };
-exports.updateSchedule = async (req, res, next) => { try { const { doctorId, weekday, period, maxNumber, fee, status } = req.body; await pool.query(`UPDATE weekly_schedules SET doctor_id = ?, weekday = ?, period = ?, max_slots = ?, fee = ?, status = ? WHERE id = ?`, [doctorId, weekday, period, maxNumber || 20, fee || 15, status ?? 1, req.params.id]); res.json({ success: true, message: '排班更新成功' }); } catch (error) { next(error); } };
-exports.deleteSchedule = async (req, res, next) => { try { await pool.query('DELETE FROM weekly_schedules WHERE id = ?', [req.params.id]); res.json({ success: true, message: '排班删除成功' }); } catch (error) { next(error); } };
+exports.createSchedule = async (req, res, next) => { 
+  try { 
+    const { doctorId, weekday, period, maxNumber, fee, status } = req.body; 
+    if (!doctorId || !weekday || !period) return res.status(400).json({ success: false, message: '请完整填写排班信息' }); 
+    await pool.query(`INSERT INTO weekly_schedules (doctor_id, weekday, period, max_slots, fee, status) VALUES (?, ?, ?, ?, ?, ?)`, [doctorId, weekday, period, maxNumber || 20, fee || 15, status ?? 1]); 
+    res.json({ success: true, message: '排班新增成功' }); 
+  } catch (error) { next(error); } 
+};
+exports.updateSchedule = async (req, res, next) => { 
+  try { 
+    const { doctorId, weekday, period, maxNumber, fee, status } = req.body; 
+    await pool.query(`UPDATE weekly_schedules SET doctor_id = ?, weekday = ?, period = ?, max_slots = ?, fee = ?, status = ? WHERE id = ?`, [doctorId, weekday, period, maxNumber || 20, fee || 15, status ?? 1, req.params.id]); 
+    res.json({ success: true, message: '排班更新成功' }); 
+  } catch (error) { next(error); } 
+};
+exports.deleteSchedule = async (req, res, next) => { 
+  try { 
+    await pool.query('DELETE FROM weekly_schedules WHERE id = ?', [req.params.id]); 
+    res.json({ success: true, message: '排班删除成功' }); 
+  } catch (error) { next(error); } 
+};
 
 exports.listAppointments = async (req, res, next) => {
   try {
@@ -139,7 +268,48 @@ exports.updateAppointment = async (req, res, next) => {
     res.json({ success: true, message: '挂号记录更新成功' });
   } catch (error) { next(error); }
 };
-exports.deleteAppointment = async (req, res, next) => { try { await pool.query('DELETE FROM appointments WHERE id = ?', [req.params.id]); res.json({ success: true, message: '挂号记录删除成功' }); } catch (error) { next(error); } };
+exports.deleteAppointment = async (req, res, next) => {
+  const conn = await pool.getConnection();
+  try {
+    const appointmentId = Number(req.params.id);
+
+    const [[appointment]] = await conn.query(
+      'select id, appointment_no from appointments where id = ? limit 1',
+      [appointmentId]
+    );
+    if (!appointment) {
+      return res.status(404).json({ success: false, message: '挂号记录不存在' });
+    }
+
+    const [[visitRef]] = await conn.query(
+      'select id from visit_records where appointment_id = ? limit 1',
+      [appointmentId]
+    );
+    const [[logRef]] = await conn.query(
+      'select id from appointment_logs where appointment_id = ? limit 1',
+      [appointmentId]
+    );
+
+    if (visitRef) {
+      return res.status(400).json({
+        success: false,
+        message: '该挂号记录已生成就诊记录，不能直接删除'
+      });
+    }
+
+    await conn.beginTransaction();
+    await conn.query('delete from appointment_logs where appointment_id = ?', [appointmentId]);
+    await conn.query('delete from appointments where id = ?', [appointmentId]);
+    await conn.commit();
+
+    res.json({ success: true, message: '挂号记录删除成功' });
+  } catch (error) {
+    try { await conn.rollback(); } catch (_) {}
+    next(error);
+  } finally {
+    conn.release();
+  }
+};
 
 exports.listVisits = async (req, res, next) => {
   try {

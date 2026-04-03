@@ -23,5 +23,8 @@ import { patientApi } from '../../api/modules'
 import PageContainer from '../../components/PageContainer.vue'
 import { formatDateTime } from '../../utils'
 const list = ref([])
-onMounted(async () => { const res = await patientApi.visits(); list.value = res.data || [] })
+onMounted(async () => { 
+  const res = await patientApi.visits(); 
+  list.value = res.data || [] 
+})
 </script>

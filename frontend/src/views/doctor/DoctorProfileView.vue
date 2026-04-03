@@ -21,7 +21,14 @@ import { authApi } from '../../api/modules'
 import PageContainer from '../../components/PageContainer.vue'
 import { successTip } from '../../utils'
 const form = reactive({ username:'', name:'', gender:'男', title:'', departmentName:'', specialty:'', phone:'', intro:'' })
-async function load(){ const res = await authApi.doctorProfile(); Object.assign(form, res.data || {}) }
-async function submit(){ await authApi.updateDoctorProfile({ name: form.name, gender: form.gender, phone: form.phone, intro: form.intro }); successTip('个人信息已更新'); load() }
+async function load(){ 
+  const res = await authApi.doctorProfile(); 
+  Object.assign(form, res.data || {}) 
+}
+async function submit(){ 
+  await authApi.updateDoctorProfile({ name: form.name, gender: form.gender, phone: form.phone, intro: form.intro }); 
+  successTip('个人信息已更新'); 
+  load() 
+}
 onMounted(load)
 </script>
