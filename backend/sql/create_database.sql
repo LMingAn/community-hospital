@@ -2,22 +2,6 @@ drop database if exists community_hospital;
 create database community_hospital default character set utf8mb4 collate utf8mb4_unicode_ci;
 use community_hospital;
 
-create table departments (
-  id int primary key auto_increment comment '科室主键',
-  name varchar(10) not null comment '科室名称',
-  description varchar(50) default '' comment '科室简介',
-  location varchar(20) default '' comment '科室位置',
-  status tinyint not null default 1 comment '状态：1启用，0停用'
-) comment='科室信息表';
-
-create table announcements (
-  id int primary key auto_increment comment '公告主键',
-  title varchar(50) not null comment '公告标题',
-  content text not null comment '公告内容',
-  published_at datetime not null default current_timestamp comment '发布时间',
-  status tinyint not null default 1 comment '状态：1发布，0下线'
-) comment='系统公告表';
-
 create table admins (
   id int primary key auto_increment comment '管理员主键',
   username varchar(20) not null unique comment '登录账号',
@@ -40,7 +24,6 @@ create table doctors (
   profile text comment '个人简介',
   avatar varchar(100) default '' comment '头像地址',
   status tinyint not null default 1 comment '状态：1在职，0停用',
-  created_at datetime not null default current_timestamp comment '创建时间',
   constraint fk_doctor_department foreign key (dept_id) references departments(id)
 ) comment='医生信息表';
 
@@ -56,6 +39,22 @@ create table patients (
   status tinyint not null default 1 comment '状态：1正常，0停用',
   created_at datetime not null default current_timestamp comment '创建时间'
 ) comment='患者信息表';
+
+create table departments (
+  id int primary key auto_increment comment '科室主键',
+  name varchar(10) not null comment '科室名称',
+  description varchar(50) default '' comment '科室简介',
+  location varchar(20) default '' comment '科室位置',
+  status tinyint not null default 1 comment '状态：1启用，0停用'
+) comment='科室信息表';
+
+create table announcements (
+  id int primary key auto_increment comment '公告主键',
+  title varchar(50) not null comment '公告标题',
+  content text not null comment '公告内容',
+  published_at datetime not null default current_timestamp comment '发布时间',
+  status tinyint not null default 1 comment '状态：1发布，0下线'
+) comment='系统公告表';
 
 create table weekly_schedules (
   id int primary key auto_increment comment '排班主键',
@@ -93,11 +92,10 @@ create table visit_records (
   patient_id int not null comment '患者id',
   doctor_id int not null comment '医生id',
   diagnosis varchar(50) default '' comment '诊断结果',
-  advice_content_html mediumtext comment '医嘱内容html',
+  advice_content_html mediumtext comment '医嘱内容',
   prescription text comment '处方建议',
   need_inpatient tinyint not null default 0 comment '是否需要住院：1是，0否',
   created_at datetime not null default current_timestamp comment '创建时间',
-  updated_at datetime not null default current_timestamp on update current_timestamp comment '更新时间',
   constraint fk_visit_appointment foreign key (appointment_id) references appointments(id),
   constraint fk_visit_patient foreign key (patient_id) references patients(id),
   constraint fk_visit_doctor foreign key (doctor_id) references doctors(id)
@@ -115,12 +113,3 @@ create table hospitalization_records (
   constraint fk_hospital_patient foreign key (patient_id) references patients(id),
   constraint fk_hospital_visit foreign key (visit_id) references visit_records(id)
 ) comment='住院登记表';
-
-create table appointment_logs (
-  id int primary key auto_increment comment '挂号日志主键',
-  appointment_id int not null comment '挂号id',
-  action varchar(10) not null comment '操作类型',
-  remark varchar(100) default '' comment '操作说明',
-  created_at datetime not null default current_timestamp comment '记录时间',
-  constraint fk_log_appointment foreign key (appointment_id) references appointments(id)
-) comment='挂号流转日志表';

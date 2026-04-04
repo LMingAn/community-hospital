@@ -64,7 +64,6 @@ exports.createAppointment = async (req, res, next) => {
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '待叫号')`,
       [appointmentNo, patientId, doctorId, departmentId, visitDate, period, queueNo, schedule.fee, symptom || '', triage.department]
     );
-    await conn.query('INSERT INTO appointment_logs (appointment_id, action, remark) VALUES (?, ?, ?)', [result.insertId, '创建挂号', '患者完成线上预约挂号']);
     await conn.commit();
     res.json({ success: true, message: '挂号成功', data: { appointmentNo, queueNo, fee: schedule.fee } });
   } catch (error) {
@@ -91,7 +90,6 @@ exports.cancelAppointment = async (req, res, next) => {
       return res.status(400).json({ success: false, message: '医生叫号后不可在线取消' });
     }
     await conn.query("UPDATE appointments SET status = '已取消' WHERE id = ?", [id]);
-    await conn.query('INSERT INTO appointment_logs (appointment_id, action, remark) VALUES (?, ?, ?)', [id, '取消挂号', '患者在叫号前取消挂号']);
     await conn.commit();
     res.json({ success: true, message: '挂号已取消' });
   } catch (error) {

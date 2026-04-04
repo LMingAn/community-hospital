@@ -1,5 +1,5 @@
 <template>
-  <PageContainer title="就诊处理" desc="医生可选择已叫号患者填写诊断、医嘱和住院建议">
+  <PageContainer title="就诊处理" desc="医生可选择待就诊患者填写诊断、医嘱和住院建议">
     <div class="toolbar">
       <div class="left">
         <el-date-picker v-model="date" type="date" value-format="YYYY-MM-DD" />
@@ -9,8 +9,8 @@
     <div class="visit-layout">
       <section class="visit-left">
         <div class="page-card page-block" style="height:100%;">
-          <div class="section-title">待处理患者</div>
-          <el-empty v-if="visitableRows.length === 0" description="暂无可处理患者" />
+          <div class="section-title">待就诊患者</div>
+          <el-empty v-if="visitableRows.length === 0" description="暂无可就诊患者" />
           <div v-for="item in visitableRows" :key="item.id" class="doctor-card visit-card" :class="{ 'visit-selected': selected?.id === item.id }">
             <div class="doctor-card-header">
               <div>
@@ -27,7 +27,7 @@
       <section class="visit-right">
         <div class="page-card page-block">
           <div class="section-title">病历填写</div>
-          <el-alert v-if="!selected" title="请先从左侧选择要处理的患者" type="info" :closable="false" show-icon style="margin-bottom:16px;" />
+          <el-alert v-if="!selected" title="请先从左侧选择要就诊的患者" type="info" :closable="false" show-icon style="margin-bottom:16px;" />
           <el-form :model="form" label-width="92px">
             <el-form-item label="当前患者">
               <el-input :model-value="selected ? `${selected.patientName}（${selected.appointmentNo}）` : ''" disabled placeholder="请先选择患者" />

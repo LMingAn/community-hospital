@@ -48,7 +48,6 @@ exports.callPatient = async (req, res, next) => {
       return res.status(400).json({ success: false, message: '当前状态不可叫号' });
     }
     await conn.query("UPDATE appointments SET status = '已叫号' WHERE id = ?", [id]);
-    await conn.query('INSERT INTO appointment_logs (appointment_id, action, remark) VALUES (?, ?, ?)', [id, '医生叫号', '医生已对患者进行叫号']);
     await conn.commit();
     res.json({ success: true, message: '叫号成功' });
   } catch (error) {
@@ -92,7 +91,6 @@ exports.saveVisit = async (req, res, next) => {
         [appointment.patientId, visitRow.id, wardNo || '', bedNo || '', reasonText || diagnosis || '根据病情建议住院观察']
       );
     }
-    await conn.query('INSERT INTO appointment_logs (appointment_id, action, remark) VALUES (?, ?, ?)', [appointmentId, '完成就诊', '医生已填写病历并完成就诊']);
     await conn.commit();
     res.json({ success: true, message: '就诊记录保存成功' });
   } catch (error) {

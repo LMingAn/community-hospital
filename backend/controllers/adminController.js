@@ -285,10 +285,6 @@ exports.deleteAppointment = async (req, res, next) => {
       'select id from visit_records where appointment_id = ? limit 1',
       [appointmentId]
     );
-    const [[logRef]] = await conn.query(
-      'select id from appointment_logs where appointment_id = ? limit 1',
-      [appointmentId]
-    );
 
     if (visitRef) {
       return res.status(400).json({
@@ -298,7 +294,6 @@ exports.deleteAppointment = async (req, res, next) => {
     }
 
     await conn.beginTransaction();
-    await conn.query('delete from appointment_logs where appointment_id = ?', [appointmentId]);
     await conn.query('delete from appointments where id = ?', [appointmentId]);
     await conn.commit();
 
