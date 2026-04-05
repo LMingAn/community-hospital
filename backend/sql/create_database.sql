@@ -11,6 +11,14 @@ create table admins (
   email varchar(30) default '' comment '邮箱地址'
 ) comment='管理员信息表';
 
+create table departments (
+  id int primary key auto_increment comment '科室主键',
+  name varchar(10) not null comment '科室名称',
+  description varchar(50) default '' comment '科室简介',
+  location varchar(20) default '' comment '科室位置',
+  status tinyint not null default 1 comment '状态：1启用，0停用'
+) comment='科室信息表';
+
 create table doctors (
   id int primary key auto_increment comment '医生主键',
   dept_id int not null comment '所属科室id',
@@ -22,7 +30,6 @@ create table doctors (
   specialty varchar(50) default '' comment '擅长方向',
   phone varchar(11) not null comment '联系电话',
   profile text comment '个人简介',
-  avatar varchar(100) default '' comment '头像地址',
   status tinyint not null default 1 comment '状态：1在职，0停用',
   constraint fk_doctor_department foreign key (dept_id) references departments(id)
 ) comment='医生信息表';
@@ -39,14 +46,6 @@ create table patients (
   status tinyint not null default 1 comment '状态：1正常，0停用',
   created_at datetime not null default current_timestamp comment '创建时间'
 ) comment='患者信息表';
-
-create table departments (
-  id int primary key auto_increment comment '科室主键',
-  name varchar(10) not null comment '科室名称',
-  description varchar(50) default '' comment '科室简介',
-  location varchar(20) default '' comment '科室位置',
-  status tinyint not null default 1 comment '状态：1启用，0停用'
-) comment='科室信息表';
 
 create table announcements (
   id int primary key auto_increment comment '公告主键',

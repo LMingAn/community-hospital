@@ -34,9 +34,6 @@
           </div>
         </el-form-item>
       </el-form>
-      <div class="portal-tip muted">
-        演示账号可使用初始化数据：管理员 admin / 123456，医生 doctor01 / 123456，患者 patient01 / 123456。
-      </div>
     </div>
   </div>
 </template>

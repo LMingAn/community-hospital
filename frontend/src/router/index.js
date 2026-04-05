@@ -3,7 +3,6 @@ import { useAuthStore } from '../stores/auth'
 const routes = [
   { path: '/', redirect: '/portal' },
   { path: '/portal', component: () => import('../views/public/PortalView.vue'), meta: { title: '系统门户', guestOnly: true } },
-  { path: '/login/:role(admin|doctor|patient)', component: () => import('../views/auth/LoginView.vue'), meta: { guestOnly: true, title: '登录' } },
   { path: '/register/patient', component: () => import('../views/auth/PatientRegisterView.vue'), meta: { guestOnly: true, title: '患者注册' } },
   { path: '/register/doctor', component: () => import('../views/auth/DoctorRegisterView.vue'), meta: { guestOnly: true, title: '医生注册' } },
   { path: '/admin', component: () => import('../layouts/RoleLayout.vue'), meta: { role: 'admin', title: '管理员后台' }, children: [
@@ -48,8 +47,11 @@ router.beforeEach(async (to) => {
   if (to.meta?.guestOnly && auth.user) return `/${auth.role}`
   const requiredRole = to.meta?.role
   if (requiredRole) {
-    if (!auth.user) { auth.clearAuth(); return `/login/${requiredRole}` }
-    if (auth.role !== requiredRole) return `/${auth.role}`
+  if (!auth.user) {
+    auth.clearAuth()
+    return '/portal'
+  }
+  if (auth.role !== requiredRole) return `/${auth.role}`
   }
   document.title = `${to.meta?.title || '系统'} - 社区医院预约挂号系统`
   return true
