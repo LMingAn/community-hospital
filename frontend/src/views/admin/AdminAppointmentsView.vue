@@ -27,30 +27,30 @@
             </el-table-column>
         </el-table>
         <el-dialog v-model="visible" :title="form.id ? '编辑挂号' : '新增挂号'" width="760px">
-            <el-form :model="form" label-width="88px">
+            <el-form ref="formRef" :model="form" :rules="rules" label-width="88px">
                 <div class="form-grid">
-                    <el-form-item label="挂号单号">
+                    <el-form-item label="挂号单号" prop="appointmentNo" required>
                         <el-input v-model="form.appointmentNo" />
                     </el-form-item>
-                    <el-form-item label="患者">
+                    <el-form-item label="患者" prop="patientId" required>
                         <el-select v-model="form.patientId">
                             <el-option v-for="item in patients" :key="item.id" :label="item.name" :value="item.id" />
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="医生">
+                    <el-form-item label="医生" prop="doctorId" required>
                         <el-select v-model="form.doctorId" @change="syncDepartment">
                             <el-option v-for="item in doctors" :key="item.id" :label="`${item.name}（${item.departmentName}）`" :value="item.id" />
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="科室">
+                    <el-form-item label="科室" prop="departmentId" required>
                         <el-select v-model="form.departmentId">
                             <el-option v-for="item in departments" :key="item.id" :label="item.name" :value="item.id" />
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="就诊日期">
+                    <el-form-item label="就诊日期" prop="visitDate" required>
                         <el-date-picker v-model="form.visitDate" type="date" value-format="YYYY-MM-DD" />
                     </el-form-item>
-                    <el-form-item label="时段">
+                    <el-form-item label="时段" prop="period" required>
                         <el-select v-model="form.period">
                             <el-option label="上午" value="上午" />
                             <el-option label="下午" value="下午" />
@@ -88,19 +88,31 @@
     </PageContainer>
 </template>
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, nextTick, onMounted, reactive, ref } from 'vue'
 import PageContainer from '../../components/PageContainer.vue'
 import { adminApi } from '../../api/modules'
 import { formatDateTime, statusClass, confirmAction, successTip } from '../../utils'
 const list = ref([]), doctors = ref([]), patients = ref([]), departments = ref([]), visible = ref(false), keyword = ref('')
+const formRef = ref()
 const form = reactive({ id:'', appointmentNo:'', patientId:'', doctorId:'', departmentId:'', visitDate:'', period:'上午', queueNo:1, fee:15, symptom:'', triageResult:'', status:'待叫号' })
+const rules = {
+    appointmentNo: [{ required: true, message: '请填写挂号单号', trigger: 'blur' }],
+    patientId: [{ required: true, message: '请选择患者', trigger: 'change' }],
+    doctorId: [{ required: true, message: '请选择医生', trigger: 'change' }],
+    departmentId: [{ required: true, message: '请选择科室', trigger: 'change' }],
+    visitDate: [{ required: true, message: '请选择就诊日期', trigger: 'change' }],
+    period: [{ required: true, message: '请选择就诊时段', trigger: 'change' }]
+}
 const filteredList = computed(() => list.value.filter(item => !keyword.value || `${item.appointmentNo}${item.patientName}${item.doctorName}`.includes(keyword.value)))
 const reset = () => Object.assign(form, { id:'', appointmentNo:`YY${Date.now()}`, patientId:'', doctorId:'', departmentId:'', visitDate:'', period:'上午', queueNo:1, fee:15, symptom:'', triageResult:'', status:'待叫号' })
 async function load(){ const [a,d,p,dep] = await Promise.all([adminApi.appointments(), adminApi.doctors(), adminApi.patients(), adminApi.departments()]); list.value = a.data || []; doctors.value = d.data || []; patients.value = p.data || []; departments.value = dep.data || [] }
 function syncDepartment(id){ const doctor = doctors.value.find(item => item.id === id); if (doctor) form.departmentId = doctor.departmentId }
-function openCreate(){ reset(); visible.value = true }
-function openEdit(row){ Object.assign(form, row); visible.value = true }
+function resetValidation(){ nextTick(() => formRef.value?.clearValidate()) }
+function openCreate(){ reset(); visible.value = true; resetValidation() }
+function openEdit(row){ Object.assign(form, row); visible.value = true; resetValidation() }
 async function submit(){ 
+    const valid = await formRef.value?.validate().then(() => true).catch(() => false)
+    if (!valid) return
     if(form.id) 
         await adminApi.updateAppointment(form.id, form); 
     else 

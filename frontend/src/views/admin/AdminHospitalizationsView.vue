@@ -20,10 +20,10 @@
       <el-table-column label="操作" width="180"><template #default="{ row }"><el-button link type="primary" @click="openEdit(row)">编辑</el-button><el-button link type="danger" @click="remove(row)">删除</el-button></template></el-table-column>
     </el-table>
     <el-dialog v-model="visible" :title="form.id ? '编辑住院登记' : '新增住院登记'" width="640px">
-      <el-form :model="form" label-width="88px">
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="88px">
         <div class="form-grid">
-          <el-form-item label="患者"><el-select v-model="form.patientId"><el-option v-for="item in patients" :key="item.id" :label="item.name" :value="item.id" /></el-select></el-form-item>
-          <el-form-item label="就诊记录"><el-select v-model="form.visitRecordId"><el-option v-for="item in visits" :key="item.id" :label="`${item.appointmentNo} / ${item.patientName}`" :value="item.id" /></el-select></el-form-item>
+          <el-form-item label="患者" prop="patientId" required><el-select v-model="form.patientId"><el-option v-for="item in patients" :key="item.id" :label="item.name" :value="item.id" /></el-select></el-form-item>
+          <el-form-item label="就诊记录" prop="visitRecordId" required><el-select v-model="form.visitRecordId"><el-option v-for="item in visits" :key="item.id" :label="`${item.appointmentNo} / ${item.patientName}`" :value="item.id" /></el-select></el-form-item>
           <el-form-item label="病区"><el-input v-model="form.wardNo" /></el-form-item>
           <el-form-item label="床位"><el-input v-model="form.bedNo" /></el-form-item>
           <el-form-item label="住院原因" class="span-2"><el-input v-model="form.reasonText" type="textarea" :rows="3" /></el-form-item>
@@ -35,25 +35,33 @@
   </PageContainer>
 </template>
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, nextTick, onMounted, reactive, ref } from 'vue'
 import { adminApi } from '../../api/modules'
 import PageContainer from '../../components/PageContainer.vue'
 import { statusClass, confirmAction, successTip } from '../../utils'
 const list = ref([]), patients = ref([]), visits = ref([]), visible = ref(false), keyword = ref('')
+const formRef = ref()
 const filteredList = computed(() => {
   const q = keyword.value.trim()
   if (!q) return list.value
   return list.value.filter((row) => `${row.patientName || ''}${row.wardNo || ''}${row.bedNo || ''}${row.reasonText || ''}${row.status || ''}${row.createdAt || ''}`.includes(q))
 })
 const form = reactive({ id:'', patientId:'', visitRecordId:'', wardNo:'', bedNo:'', reasonText:'', status:'待入院' })
+const rules = {
+  patientId: [{ required: true, message: '请选择患者', trigger: 'change' }],
+  visitRecordId: [{ required: true, message: '请选择就诊记录', trigger: 'change' }]
+}
 const reset = () => Object.assign(form, { id:'', patientId:'', visitRecordId:'', wardNo:'', bedNo:'', reasonText:'', status:'待入院' })
 async function load(){ 
   const [hRes,pRes,vRes] = await Promise.all([adminApi.hospitalizations(), adminApi.patients(), adminApi.visits()]); 
   list.value = hRes.data || []; patients.value = pRes.data || []; visits.value = vRes.data || [] 
 }
-function openCreate(){ reset(); visible.value = true }
-function openEdit(row){ Object.assign(form, row); visible.value = true }
+function resetValidation(){ nextTick(() => formRef.value?.clearValidate()) }
+function openCreate(){ reset(); visible.value = true; resetValidation() }
+function openEdit(row){ Object.assign(form, row); visible.value = true; resetValidation() }
 async function submit(){ 
+  const valid = await formRef.value?.validate().then(() => true).catch(() => false)
+  if (!valid) return
   if(form.id) 
     await adminApi.updateHospitalization(form.id, form); 
   else 

@@ -6,6 +6,11 @@ async function getById(table, id) {
   return rows[0] || null;
 }
 
+function hasValue(value) {
+  if (typeof value === 'string') return value.trim() !== '';
+  return value !== undefined && value !== null;
+}
+
 exports.profile = async (req, res, next) => {
   try {
     const [[row]] = await pool.query('SELECT id, username, nickname, phone, email FROM admins WHERE id = ?', [req.session.admin.id]);
@@ -257,6 +262,12 @@ exports.listAppointments = async (req, res, next) => {
 exports.createAppointment = async (req, res, next) => {
   try {
     const { appointmentNo, patientId, doctorId, departmentId, visitDate, period, queueNo, fee, symptom, triageResult, status } = req.body;
+    if (!hasValue(appointmentNo)) return res.status(400).json({ success: false, message: '请填写挂号单号' });
+    if (!hasValue(patientId)) return res.status(400).json({ success: false, message: '请选择患者' });
+    if (!hasValue(doctorId)) return res.status(400).json({ success: false, message: '请选择医生' });
+    if (!hasValue(departmentId)) return res.status(400).json({ success: false, message: '请选择科室' });
+    if (!hasValue(visitDate)) return res.status(400).json({ success: false, message: '请选择就诊日期' });
+    if (!hasValue(period)) return res.status(400).json({ success: false, message: '请选择就诊时段' });
     await pool.query(`INSERT INTO appointments (appointment_no, patient_id, doctor_id, dept_id, visit_date, period, queue_number, fee, symptom, triage_advice, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [appointmentNo, patientId, doctorId, departmentId, visitDate, period, queueNo || 1, fee || 0, symptom || '', triageResult || '', status || '待叫号']);
     res.json({ success: true, message: '挂号记录新增成功' });
   } catch (error) { next(error); }
@@ -315,6 +326,9 @@ exports.listVisits = async (req, res, next) => {
 exports.createVisit = async (req, res, next) => {
   try {
     const { appointmentId, patientId, doctorId, diagnosis, adviceHtml, prescription, needHospitalization } = req.body;
+    if (!hasValue(appointmentId)) return res.status(400).json({ success: false, message: '请选择挂号单号' });
+    if (!hasValue(patientId)) return res.status(400).json({ success: false, message: '请选择患者' });
+    if (!hasValue(doctorId)) return res.status(400).json({ success: false, message: '请选择医生' });
     await pool.query(`INSERT INTO visit_records (appointment_id, patient_id, doctor_id, diagnosis, advice_content_html, prescription, need_inpatient) VALUES (?, ?, ?, ?, ?, ?, ?)`, [appointmentId, patientId, doctorId, diagnosis || '', adviceHtml || '', prescription || '', needHospitalization ? 1 : 0]);
     res.json({ success: true, message: '就诊记录新增成功' });
   } catch (error) { next(error); }
@@ -328,7 +342,43 @@ exports.updateVisit = async (req, res, next) => {
     res.json({ success: true, message: '就诊记录更新成功' });
   } catch (error) { next(error); }
 };
-exports.deleteVisit = async (req, res, next) => { try { await pool.query('DELETE FROM visit_records WHERE id = ?', [req.params.id]); res.json({ success: true, message: '就诊记录删除成功' }); } catch (error) { next(error); } };
+exports.deleteVisit = async (req, res, next) => {
+  const conn = await pool.getConnection();
+  try {
+    const visitId = Number(req.params.id);
+
+    const [[visit]] = await conn.query(
+      'select id, appointment_id from visit_records where id = ? limit 1',
+      [visitId]
+    );
+    if (!visit) {
+      return res.status(404).json({ success: false, message: '就诊记录不存在' });
+    }
+
+    const [[hospitalRef]] = await conn.query(
+      'select id from hospitalization_records where visit_id = ? limit 1',
+      [visitId]
+    );
+
+    if (hospitalRef) {
+      return res.status(400).json({
+        success: false,
+        message: '该就诊记录已生成住院登记，不能直接删除'
+      });
+    }
+
+    await conn.beginTransaction();
+    await conn.query('delete from visit_records where id = ?', [visitId]);
+    await conn.commit();
+
+    res.json({ success: true, message: '就诊记录删除成功' });
+  } catch (error) {
+    try { await conn.rollback(); } catch (_) {}
+    next(error);
+  } finally {
+    conn.release();
+  }
+};
 
 exports.listHospitalizations = async (req, res, next) => {
   try {
@@ -339,6 +389,8 @@ exports.listHospitalizations = async (req, res, next) => {
 exports.createHospitalization = async (req, res, next) => {
   try {
     const { patientId, visitRecordId, wardNo, bedNo, reasonText, status } = req.body;
+    if (!hasValue(patientId)) return res.status(400).json({ success: false, message: '请选择患者' });
+    if (!hasValue(visitRecordId)) return res.status(400).json({ success: false, message: '请选择就诊记录' });
     await pool.query(`INSERT INTO hospitalization_records (patient_id, visit_id, ward_no, bed_no, admission_reason, status) VALUES (?, ?, ?, ?, ?, ?)`, [patientId, visitRecordId, wardNo || '', bedNo || '', reasonText || '', status || '待入院']);
     res.json({ success: true, message: '住院登记新增成功' });
   } catch (error) { next(error); }
