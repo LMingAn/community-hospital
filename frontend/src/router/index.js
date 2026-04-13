@@ -3,6 +3,8 @@ import { useAuthStore } from '../stores/auth'
 const routes = [
   { path: '/', redirect: '/portal' },
   { path: '/portal', component: () => import('../views/public/PortalView.vue'), meta: { title: '系统门户', guestOnly: true } },
+  { path: '/reset/patient', component: () => import('../views/public/RoleResetPasswordView.vue'), props: { role: 'patient' }, meta: { guestOnly: true, title: '患者修改密码' } },
+  { path: '/reset/doctor', component: () => import('../views/public/RoleResetPasswordView.vue'), props: { role: 'doctor' }, meta: { guestOnly: true, title: '医生修改密码' } },
   { path: '/register/patient', component: () => import('../views/auth/PatientRegisterView.vue'), meta: { guestOnly: true, title: '患者注册' } },
   { path: '/register/doctor', component: () => import('../views/auth/DoctorRegisterView.vue'), meta: { guestOnly: true, title: '医生注册' } },
   { path: '/admin', component: () => import('../layouts/RoleLayout.vue'), meta: { role: 'admin', title: '管理员后台' }, children: [
