@@ -9,7 +9,7 @@ const routes = [
   { path: '/register/doctor', component: () => import('../views/auth/DoctorRegisterView.vue'), meta: { guestOnly: true, title: '医生注册' } },
   { path: '/admin', component: () => import('../layouts/RoleLayout.vue'), meta: { role: 'admin', title: '管理员后台' }, children: [
     { path: '', redirect: '/admin/dashboard' }, 
-    { path: 'dashboard', component: () => import('../views/admin/AdminDashboardView.vue'), meta: { title: '首页' } }, 
+    { path: 'dashboard', component: () => import('../views/admin/AdminDashboardView.vue'), meta: { title: '信息概览' } }, 
     { path: 'announcements', component: () => import('../views/admin/AdminAnnouncementsView.vue'), meta: { title: '公告信息' } }, 
     { path: 'departments', component: () => import('../views/admin/AdminDepartmentsView.vue'), meta: { title: '科室信息' } }, 
     { path: 'schedules', component: () => import('../views/admin/AdminSchedulesView.vue'), meta: { title: '医生排班' } }, 
@@ -23,7 +23,7 @@ const routes = [
   ] },
   { path: '/doctor', component: () => import('../layouts/RoleLayout.vue'), meta: { role: 'doctor', title: '医生工作台' }, children: [
     { path: '', redirect: '/doctor/home' }, 
-    { path: 'home', component: () => import('../views/doctor/DoctorAnnouncementsView.vue'), meta: { title: '首页' } }, 
+    { path: 'home', component: () => import('../views/doctor/DoctorAnnouncementsView.vue'), meta: { title: '信息概览' } }, 
     { path: 'profile', component: () => import('../views/doctor/DoctorProfileView.vue'), meta: { title: '个人信息' } }, 
     { path: 'schedules', component: () => import('../views/doctor/DoctorSchedulesView.vue'), meta: { title: '我的排班' } }, 
     { path: 'appointments', component: () => import('../views/doctor/DoctorAppointmentsView.vue'), meta: { title: '挂号患者' } }, 
@@ -33,7 +33,7 @@ const routes = [
   ] },
   { path: '/patient', component: () => import('../layouts/RoleLayout.vue'), meta: { role: 'patient', title: '患者服务台' }, children: [
     { path: '', redirect: '/patient/home' }, 
-    { path: 'home', component: () => import('../views/patient/PatientHomeView.vue'), meta: { title: '首页' } }, 
+    { path: 'home', component: () => import('../views/patient/PatientHomeView.vue'), meta: { title: '信息概览' } }, 
     { path: 'profile', component: () => import('../views/patient/PatientProfileView.vue'), meta: { title: '个人信息' } }, 
     { path: 'appointment', component: () => import('../views/patient/PatientAppointmentView.vue'), meta: { title: '预约挂号' } }, 
     { path: 'appointments', component: () => import('../views/patient/PatientAppointmentsView.vue'), meta: { title: '我的挂号' } }, 

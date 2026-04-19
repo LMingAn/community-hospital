@@ -1,5 +1,5 @@
 <template>
-  <PageContainer title="首页" desc="公开展示医院今日排班、系统公告与基础科室信息">
+  <PageContainer title="信息概览" desc="公开展示医院今日排班、系统公告与基础科室信息">
     <div class="page-split-grid">
       <div class="page-card page-block">
         <div class="section-title">系统公告</div>

@@ -39,7 +39,6 @@
           </div>
         </el-form-item>
       </el-form>
-      <p class="portal-tip">演示环境会直接展示验证码，正式环境可替换为短信发送。</p>
     </div>
   </div>
 </template>

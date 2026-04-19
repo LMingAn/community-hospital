@@ -1,6 +1,6 @@
 export const roleMenus = {
   admin: [
-    { key: 'dashboard', title: '首页', icon: 'home', path: '/admin/dashboard' },
+    { key: 'dashboard', title: '信息概览', icon: 'home', path: '/admin/dashboard' },
     { key: 'info', title: '信息管理', icon: 'inventory_2', tabs: [ 
       { label: '系统公告', path: '/admin/announcements' }, 
       { label: '科室信息', path: '/admin/departments' }, 
@@ -19,20 +19,20 @@ export const roleMenus = {
     { key: 'account', title: '个人中心', icon: 'manage_accounts', tabs: [ { label: '修改密码', path: '/admin/password' } ] }
   ],
   doctor: [
-    { key: 'home', title: '首页', icon: 'home', path: '/doctor/home' },
+    { key: 'home', title: '信息概览', icon: 'home', path: '/doctor/home' },
     { key: 'schedule', title: '排班与挂号', icon: 'event_note', tabs: [ 
       { label: '我的排班', path: '/doctor/schedules' }, 
       { label: '挂号患者', path: '/doctor/appointments' }, 
       { label: '患者叫号', path: '/doctor/calls' } ] 
     },
     { key: 'visit', title: '患者就诊', icon: 'medical_services', tabs: [ { label: '就诊处理', path: '/doctor/visit' } ] },
-    { key: 'account', title: '账号管理', icon: 'badge', tabs: [ 
+    { key: 'account', title: '个人中心', icon: 'badge', tabs: [ 
       { label: '个人信息', path: '/doctor/profile' }, 
       { label: '修改密码', path: '/doctor/password' } ] 
     }
   ],
   patient: [
-    { key: 'home', title: '首页', icon: 'home', path: '/patient/home' },
+    { key: 'home', title: '信息概览', icon: 'home', path: '/patient/home' },
     { key: 'register', title: '挂号服务', icon: 'calendar_month', tabs: [ 
       { label: '预约挂号', path: '/patient/appointment' }, 
       { label: '我的挂号', path: '/patient/appointments' } ] 
