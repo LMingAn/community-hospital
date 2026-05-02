@@ -16,7 +16,9 @@ create table departments (
   name varchar(10) not null comment '科室名称',
   description varchar(50) default '' comment '科室简介',
   location varchar(20) default '' comment '科室位置',
-  status tinyint not null default 1 comment '状态：1启用，0停用'
+  status tinyint not null default 1 comment '状态：1启用，0停用',
+  unique key uk_department_name (name),
+  constraint chk_department_status check (status in (0, 1))
 ) comment='科室信息表';
 
 create table doctors (
@@ -31,7 +33,9 @@ create table doctors (
   phone varchar(11) not null comment '联系电话',
   profile text comment '个人简介',
   status tinyint not null default 1 comment '状态：1在职，0停用',
-  constraint fk_doctor_department foreign key (dept_id) references departments(id)
+  unique key uk_doctor_phone (phone),
+  constraint fk_doctor_department foreign key (dept_id) references departments(id),
+  constraint chk_doctor_status check (status in (0, 1))
 ) comment='医生信息表';
 
 create table patients (
@@ -44,7 +48,9 @@ create table patients (
   phone varchar(11) not null unique comment '手机号',
   identity_card_no char(18) default '' comment '身份证号',
   status tinyint not null default 1 comment '状态：1正常，0停用',
-  created_at datetime not null default current_timestamp comment '创建时间'
+  created_at datetime not null default current_timestamp comment '创建时间',
+  constraint chk_patient_age check (age is null or (age >= 0 and age <= 120)),
+  constraint chk_patient_status check (status in (0, 1))
 ) comment='患者信息表';
 
 create table announcements (
@@ -52,7 +58,8 @@ create table announcements (
   title varchar(50) not null comment '公告标题',
   content text not null comment '公告内容',
   published_at datetime not null default current_timestamp comment '发布时间',
-  status tinyint not null default 1 comment '状态：1发布，0下线'
+  status tinyint not null default 1 comment '状态：1发布，0下线',
+  constraint chk_announcement_status check (status in (0, 1))
 ) comment='系统公告表';
 
 create table weekly_schedules (
@@ -63,7 +70,12 @@ create table weekly_schedules (
   max_slots int not null default 20 comment '最大号源数',
   fee decimal(10,2) not null default 15.00 comment '挂号费用',
   status tinyint not null default 1 comment '状态：1启用，0停用',
-  constraint fk_weekly_schedule_doctor foreign key (doctor_id) references doctors(id)
+  unique key uk_schedule_doctor_time (doctor_id, weekday, period),
+  constraint fk_weekly_schedule_doctor foreign key (doctor_id) references doctors(id),
+  constraint chk_schedule_weekday check (weekday between 1 and 7),
+  constraint chk_schedule_slots check (max_slots > 0),
+  constraint chk_schedule_fee check (fee >= 0),
+  constraint chk_schedule_status check (status in (0, 1))
 ) comment='医生周排班表';
 
 create table appointments (
@@ -79,10 +91,15 @@ create table appointments (
   symptom text comment '症状描述',
   triage_advice varchar(50) default '' comment '分诊建议',
   status enum('待叫号','已叫号','就诊中','已完成','已取消') not null default '待叫号' comment '挂号状态',
+  active_flag tinyint generated always as (case when status <> '已取消' then 1 else null end) stored comment '有效挂号唯一约束标识',
   created_at datetime not null default current_timestamp comment '创建时间',
+  unique key uk_patient_active_period (patient_id, visit_date, period, active_flag),
+  unique key uk_doctor_active_queue (doctor_id, visit_date, period, queue_number, active_flag),
   constraint fk_appointment_patient foreign key (patient_id) references patients(id),
   constraint fk_appointment_doctor foreign key (doctor_id) references doctors(id),
-  constraint fk_appointment_department foreign key (dept_id) references departments(id)
+  constraint fk_appointment_department foreign key (dept_id) references departments(id),
+  constraint chk_appointment_queue check (queue_number > 0),
+  constraint chk_appointment_fee check (fee >= 0)
 ) comment='预约挂号表';
 
 create table visit_records (
@@ -109,6 +126,7 @@ create table hospitalization_records (
   admission_reason varchar(100) default '' comment '住院原因',
   status enum('待入院','住院中','已出院') not null default '待入院' comment '住院状态',
   created_at datetime not null default current_timestamp comment '登记时间',
+  unique key uk_hospital_visit (visit_id),
   constraint fk_hospital_patient foreign key (patient_id) references patients(id),
   constraint fk_hospital_visit foreign key (visit_id) references visit_records(id)
 ) comment='住院登记表';

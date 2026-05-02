@@ -6,7 +6,6 @@ const routes = [
   { path: '/reset/patient', component: () => import('../views/public/RoleResetPasswordView.vue'), props: { role: 'patient' }, meta: { guestOnly: true, title: '患者修改密码' } },
   { path: '/reset/doctor', component: () => import('../views/public/RoleResetPasswordView.vue'), props: { role: 'doctor' }, meta: { guestOnly: true, title: '医生修改密码' } },
   { path: '/register/patient', component: () => import('../views/auth/PatientRegisterView.vue'), meta: { guestOnly: true, title: '患者注册' } },
-  { path: '/register/doctor', component: () => import('../views/auth/DoctorRegisterView.vue'), meta: { guestOnly: true, title: '医生注册' } },
   { path: '/admin', component: () => import('../layouts/RoleLayout.vue'), meta: { role: 'admin', title: '管理员后台' }, children: [
     { path: '', redirect: '/admin/dashboard' }, 
     { path: 'dashboard', component: () => import('../views/admin/AdminDashboardView.vue'), meta: { title: '信息概览' } }, 
@@ -55,7 +54,7 @@ router.beforeEach(async (to) => {
   }
   if (auth.role !== requiredRole) return `/${auth.role}`
   }
-  document.title = `${to.meta?.title || '系统'} - 社区医院预约挂号系统`
+  document.title = `${to.meta?.title || '系统'} - 社区医院管理系统`
   return true
 })
 export default router

@@ -128,23 +128,6 @@ exports.patientResetPassword = async (req, res, next) => {
   } catch (error) { next(error); } 
 };
 
-exports.doctorRegister = async (req, res, next) => {
-  try {
-    const { username, password, name, gender, departmentId, title, specialty, phone, intro, profile } = req.body;
-    if (!username || !password || !name || !departmentId || !title || !phone) {
-      return res.status(400).json({ success: false, message: '请完整填写医生注册信息' });
-    }
-    const exists = await findOne('SELECT id FROM doctors WHERE username = ? LIMIT 1', [username]);
-    if (exists) return res.status(400).json({ success: false, message: '医生账号已存在' });
-    await pool.query(
-      `INSERT INTO doctors (dept_id, username, password_hash, name, gender, title, specialty, phone, profile, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)`,
-      [departmentId, username, hashPassword(password), name, gender || '男', title, specialty || '', phone, intro || profile || '']
-    );
-    res.json({ success: true, message: '医生注册成功，请登录' });
-  } catch (error) { next(error); }
-};
-
 exports.doctorLogin = async (req, res, next) => {
   try {
     const { username, password } = req.body;

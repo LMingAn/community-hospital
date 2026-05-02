@@ -52,6 +52,8 @@ exports.createDepartment = async (req, res, next) => {
   try {
     const { name, description, location, status } = req.body;
     if (!name) return res.status(400).json({ success: false, message: '请输入科室名称' });
+    const [[exists]] = await pool.query('SELECT id FROM departments WHERE name = ? LIMIT 1', [name]);
+    if (exists) return res.status(400).json({ success: false, message: '科室名称已存在' });
     await pool.query('INSERT INTO departments (name, description, location, status) VALUES (?, ?, ?, ?)', [name, description || '', location || '', status ?? 1]);
     res.json({ success: true, message: '科室新增成功' });
   } catch (error) { next(error); }
@@ -59,6 +61,9 @@ exports.createDepartment = async (req, res, next) => {
 exports.updateDepartment = async (req, res, next) => {
   try {
     const { name, description, location, status } = req.body;
+    if (!name) return res.status(400).json({ success: false, message: '请输入科室名称' });
+    const [[exists]] = await pool.query('SELECT id FROM departments WHERE name = ? AND id <> ? LIMIT 1', [name, req.params.id]);
+    if (exists) return res.status(400).json({ success: false, message: '科室名称已存在' });
     await pool.query('UPDATE departments SET name = ?, description = ?, location = ?, status = ? WHERE id = ?', [name, description || '', location || '', status ?? 1, req.params.id]);
     res.json({ success: true, message: '科室更新成功' });
   } catch (error) { next(error); }
@@ -77,6 +82,8 @@ exports.createDoctor = async (req, res, next) => {
   try {
     const { departmentId, username, password, name, gender, title, specialty, phone, intro, profile, status } = req.body;
     if (!departmentId || !username || !password || !name || !title || !phone) return res.status(400).json({ success: false, message: '请完整填写医生信息' });
+    const [[exists]] = await pool.query('SELECT id FROM doctors WHERE username = ? OR phone = ? LIMIT 1', [username, phone]);
+    if (exists) return res.status(400).json({ success: false, message: '医生账号或联系电话已存在' });
     await pool.query(`INSERT INTO doctors (dept_id, username, password_hash, name, gender, title, specialty, phone, profile, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [departmentId, username, hashPassword(password), name, gender || '男', title, specialty || '', phone, intro || profile || '', status ?? 1]);
     res.json({ success: true, message: '医生新增成功' });
   } catch (error) { next(error); }
@@ -84,6 +91,9 @@ exports.createDoctor = async (req, res, next) => {
 exports.updateDoctor = async (req, res, next) => {
   try {
     const { departmentId, username, name, gender, title, specialty, phone, intro, profile, status, password } = req.body;
+    if (!departmentId || !username || !name || !title || !phone) return res.status(400).json({ success: false, message: '请完整填写医生信息' });
+    const [[exists]] = await pool.query('SELECT id FROM doctors WHERE (username = ? OR phone = ?) AND id <> ? LIMIT 1', [username, phone, req.params.id]);
+    if (exists) return res.status(400).json({ success: false, message: '医生账号或联系电话已存在' });
     await pool.query(`UPDATE doctors SET dept_id = ?, username = ?, name = ?, gender = ?, title = ?, specialty = ?, phone = ?, profile = ?, status = ? WHERE id = ?`, [departmentId, username, name, gender || '男', title, specialty || '', phone, intro || profile || '', status ?? 1, req.params.id]);
     if (password) await pool.query('UPDATE doctors SET password_hash = ? WHERE id = ?', [hashPassword(password), req.params.id]);
     res.json({ success: true, message: '医生更新成功' });
@@ -141,6 +151,8 @@ exports.createPatient = async (req, res, next) => {
   try {
     const { username, password, name, gender, age, phone, idCard, status } = req.body;
     if (!username || !password || !name || !phone) return res.status(400).json({ success: false, message: '请完整填写患者信息' });
+    const [[exists]] = await pool.query('SELECT id FROM patients WHERE username = ? OR phone = ? LIMIT 1', [username, phone]);
+    if (exists) return res.status(400).json({ success: false, message: '患者账号或手机号已存在' });
     await pool.query(`INSERT INTO patients (username, password_hash, name, gender, age, phone, identity_card_no, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [username, hashPassword(password), name, gender || '男', age || null, phone, idCard || '', status ?? 1]);
     res.json({ success: true, message: '患者新增成功' });
   } catch (error) { next(error); }
@@ -148,6 +160,9 @@ exports.createPatient = async (req, res, next) => {
 exports.updatePatient = async (req, res, next) => {
   try {
     const { username, name, gender, age, phone, idCard, status, password } = req.body;
+    if (!username || !name || !phone) return res.status(400).json({ success: false, message: '请完整填写患者信息' });
+    const [[exists]] = await pool.query('SELECT id FROM patients WHERE (username = ? OR phone = ?) AND id <> ? LIMIT 1', [username, phone, req.params.id]);
+    if (exists) return res.status(400).json({ success: false, message: '患者账号或手机号已存在' });
     await pool.query(`UPDATE patients SET username = ?, name = ?, gender = ?, age = ?, phone = ?, identity_card_no = ?, status = ? WHERE id = ?`, [username, name, gender || '男', age || null, phone, idCard || '', status ?? 1, req.params.id]);
     if (password) await pool.query('UPDATE patients SET password_hash = ? WHERE id = ?', [hashPassword(password), req.params.id]);
     res.json({ success: true, message: '患者更新成功' });
@@ -235,6 +250,8 @@ exports.createSchedule = async (req, res, next) => {
   try { 
     const { doctorId, weekday, period, maxNumber, fee, status } = req.body; 
     if (!doctorId || !weekday || !period) return res.status(400).json({ success: false, message: '请完整填写排班信息' }); 
+    const [[exists]] = await pool.query('SELECT id FROM weekly_schedules WHERE doctor_id = ? AND weekday = ? AND period = ? LIMIT 1', [doctorId, weekday, period]);
+    if (exists) return res.status(400).json({ success: false, message: '该医生在当前星期和时段已存在排班' });
     await pool.query(`INSERT INTO weekly_schedules (doctor_id, weekday, period, max_slots, fee, status) VALUES (?, ?, ?, ?, ?, ?)`, [doctorId, weekday, period, maxNumber || 20, fee || 15, status ?? 1]); 
     res.json({ success: true, message: '排班新增成功' }); 
   } catch (error) { next(error); } 
@@ -242,6 +259,9 @@ exports.createSchedule = async (req, res, next) => {
 exports.updateSchedule = async (req, res, next) => { 
   try { 
     const { doctorId, weekday, period, maxNumber, fee, status } = req.body; 
+    if (!doctorId || !weekday || !period) return res.status(400).json({ success: false, message: '请完整填写排班信息' });
+    const [[exists]] = await pool.query('SELECT id FROM weekly_schedules WHERE doctor_id = ? AND weekday = ? AND period = ? AND id <> ? LIMIT 1', [doctorId, weekday, period, req.params.id]);
+    if (exists) return res.status(400).json({ success: false, message: '该医生在当前星期和时段已存在排班' });
     await pool.query(`UPDATE weekly_schedules SET doctor_id = ?, weekday = ?, period = ?, max_slots = ?, fee = ?, status = ? WHERE id = ?`, [doctorId, weekday, period, maxNumber || 20, fee || 15, status ?? 1, req.params.id]); 
     res.json({ success: true, message: '排班更新成功' }); 
   } catch (error) { next(error); } 
@@ -268,6 +288,19 @@ exports.createAppointment = async (req, res, next) => {
     if (!hasValue(departmentId)) return res.status(400).json({ success: false, message: '请选择科室' });
     if (!hasValue(visitDate)) return res.status(400).json({ success: false, message: '请选择就诊日期' });
     if (!hasValue(period)) return res.status(400).json({ success: false, message: '请选择就诊时段' });
+    const activeStatus = status || '待叫号';
+    if (activeStatus !== '已取消') {
+      const [[patientExists]] = await pool.query(
+        "SELECT id FROM appointments WHERE patient_id = ? AND visit_date = ? AND period = ? AND status <> '已取消' LIMIT 1",
+        [patientId, visitDate, period]
+      );
+      if (patientExists) return res.status(400).json({ success: false, message: '该患者在当前日期和时段已有有效挂号' });
+      const [[queueExists]] = await pool.query(
+        "SELECT id FROM appointments WHERE doctor_id = ? AND visit_date = ? AND period = ? AND queue_number = ? AND status <> '已取消' LIMIT 1",
+        [doctorId, visitDate, period, queueNo || 1]
+      );
+      if (queueExists) return res.status(400).json({ success: false, message: '该医生当前日期和时段的队列号已存在' });
+    }
     await pool.query(`INSERT INTO appointments (appointment_no, patient_id, doctor_id, dept_id, visit_date, period, queue_number, fee, symptom, triage_advice, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [appointmentNo, patientId, doctorId, departmentId, visitDate, period, queueNo || 1, fee || 0, symptom || '', triageResult || '', status || '待叫号']);
     res.json({ success: true, message: '挂号记录新增成功' });
   } catch (error) { next(error); }
@@ -275,6 +308,19 @@ exports.createAppointment = async (req, res, next) => {
 exports.updateAppointment = async (req, res, next) => {
   try {
     const { appointmentNo, patientId, doctorId, departmentId, visitDate, period, queueNo, fee, symptom, triageResult, status } = req.body;
+    const activeStatus = status || '待叫号';
+    if (activeStatus !== '已取消') {
+      const [[patientExists]] = await pool.query(
+        "SELECT id FROM appointments WHERE patient_id = ? AND visit_date = ? AND period = ? AND status <> '已取消' AND id <> ? LIMIT 1",
+        [patientId, visitDate, period, req.params.id]
+      );
+      if (patientExists) return res.status(400).json({ success: false, message: '该患者在当前日期和时段已有有效挂号' });
+      const [[queueExists]] = await pool.query(
+        "SELECT id FROM appointments WHERE doctor_id = ? AND visit_date = ? AND period = ? AND queue_number = ? AND status <> '已取消' AND id <> ? LIMIT 1",
+        [doctorId, visitDate, period, queueNo || 1, req.params.id]
+      );
+      if (queueExists) return res.status(400).json({ success: false, message: '该医生当前日期和时段的队列号已存在' });
+    }
     await pool.query(`UPDATE appointments SET appointment_no = ?, patient_id = ?, doctor_id = ?, dept_id = ?, visit_date = ?, period = ?, queue_number = ?, fee = ?, symptom = ?, triage_advice = ?, status = ? WHERE id = ?`, [appointmentNo, patientId, doctorId, departmentId, visitDate, period, queueNo || 1, fee || 0, symptom || '', triageResult || '', status || '待叫号', req.params.id]);
     res.json({ success: true, message: '挂号记录更新成功' });
   } catch (error) { next(error); }

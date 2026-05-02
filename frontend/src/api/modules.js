@@ -15,7 +15,6 @@ export const authApi = {
   patientPassword: (data) => http.patch('/api/auth/patient/password', data),
   patientResetCode: (data) => http.post('/api/auth/patient/reset-code', data),
   patientResetPassword: (data) => http.post('/api/auth/patient/reset-password', data),
-  doctorRegister: (data) => http.post('/api/auth/doctor/register', data),
   doctorLogin: (data) => http.post('/api/auth/doctor/login', data),
   doctorLogout: () => http.post('/api/auth/doctor/logout'),
   doctorProfile: () => http.get('/api/auth/doctor/profile'),

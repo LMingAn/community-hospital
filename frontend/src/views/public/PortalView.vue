@@ -8,8 +8,8 @@
       </div>
       <div class="portal-title-wrap">
         <div>
-          <h1>社区医院预约挂号系统</h1>
-          <p>请选择身份后登录系统。未登录时可从此页面进入患者或医生注册、密码重置。</p>
+          <h1>社区医院管理系统</h1>
+          <p>请选择身份后登录系统。患者可自助注册，医生账号由管理员后台分配。</p>
         </div>
         <span class="material-symbols-outlined portal-icon">local_hospital</span>
       </div>
@@ -30,7 +30,7 @@
         <el-form-item>
           <div class="portal-actions">
             <el-button type="primary" :loading="loading" @click="submit">登录系统</el-button>
-            <el-button v-if="form.role !== 'admin'" class="keep-contrast-button" @click="router.push(`/register/${form.role}`)">立即注册</el-button>
+            <el-button v-if="form.role === 'patient'" class="keep-contrast-button" @click="router.push('/register/patient')">立即注册</el-button>
             <el-button v-if="form.role !== 'admin'" class="keep-contrast-button" @click="router.push(`/reset/${form.role}`)">修改密码</el-button>
           </div>
         </el-form-item>

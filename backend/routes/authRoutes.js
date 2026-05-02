@@ -12,7 +12,6 @@ router.patch('/patient/password', requirePatient, authController.patientChangePa
 router.post('/patient/reset-code', authController.patientResetCode);
 router.post('/patient/reset-password', authController.patientResetPassword);
 
-router.post('/doctor/register', authController.doctorRegister);
 router.post('/doctor/login', authController.doctorLogin);
 router.post('/doctor/logout', authController.doctorLogout);
 router.get('/doctor/profile', requireDoctor, authController.doctorProfile);
